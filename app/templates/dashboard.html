@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mini SIEM Dashboard</title>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Mini SIEM Dashboard</h1>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+
+        <div class="card">
+            <h2>Total Logs</h2>
+            <p id="total-logs">0</p>
+        </div>
+
+        <div class="card">
+            <h2>Total Alerts</h2>
+            <p id="total-alerts">0</p>
+        </div>
+
+        <div class="card">
+            <h2>Critical Alerts</h2>
+            <p id="critical-alerts">0</p>
+        </div>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-wrapper">
+
+        <!-- LEFT SIDE -->
+        <div class="chart-container">
+            <canvas id="severityChart"></canvas>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="side-panel">
+
+            <div class="chart-legend">
+
+                <h3>Severity Legend</h3>
+
+                <div class="legend-item">
+                    <span class="color-box low"></span>Low
+                </div>
+
+                <div class="legend-item">
+                    <span class="color-box medium"></span>Medium
+                </div>
+
+                <div class="legend-item">
+                    <span class="color-box high"></span>High
+                </div>
+
+                <div class="legend-item">
+                    <span class="color-box critical"></span>Critical
+                </div>
+
+            </div>
+
+            <!-- REAL-TIME ALERTS -->
+            <div class="alerts-container">
+
+                <h2>🚨 Real-Time Alerts</h2>
+
+                <div id="critical-warning"
+                    class="critical-warning hidden">
+                    ⚠️ CRITICAL SECURITY INCIDENT DETECTED
+                </div>
+
+                <button onclick="toggleAlarm()">
+                    🔇 Mute Alarm
+                </button>
+
+                <div id="alerts-list"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    
+
+    <!-- LOGS -->
+    <div class="logs-section">
+
+        <h2>Recent Logs</h2>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>IP Address</th>
+                <th>Event Type</th>
+                <th>Severity</th>
+                <th>Message</th>
+            </tr>
+            </thead>
+
+            <tbody id="logs-table"></tbody>
+        </table>
+
+    </div>
+
+    <!-- TOP ATTACKERS (ONLY ONCE) -->
+    <div class="attackers-section">
+
+        <h2>Top Attacking IPs</h2>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Source IP</th>
+                <th>Event Count</th>
+            </tr>
+            </thead>
+
+            <tbody id="attackers-table"></tbody>
+        </table>
+
+    </div>
+
+    <!-- QUARANTINED HOSTS -->
+    <div class="attackers-section">
+
+        <h2>Quarantined Hosts</h2>
+
+        <div id="quarantined-hosts"></div>
+
+    </div>
+
+    <!-- REPORTS CENTER -->
+    <div class="card" style="margin-top:20px;">
+
+        <h2>Reports Center</h2>
+
+        <p><strong>Generate and download SIEM security reports.</strong></p>
+
+        <div style="margin-top:15px;">
+
+            <button onclick="downloadDailyReport()">
+                📄 Daily Report
+            </button>
+
+            <button onclick="downloadWeeklyReport()">
+                📊 Weekly Report
+            </button>
+
+            <button onclick="loadReportStats()">
+                🔄 Refresh
+            </button>
+            
+            <button onclick="downloadMonthlyReport()">
+                📈 Monthly Report
+            </button>
+
+        </div>
+
+        <div id="report-stats" style="margin-top:15px;">
+            Loading report statistics...
+        </div>
+
+    </div>
+
+</div>
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+<audio id="alert-sound" loop>
+    <source src="{{ url_for('static', filename='sounds/critical_alarm.mp3') }}"
+            type="audio/mpeg">
+</audio>
+
+</body>
+</html>

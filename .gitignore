@@ -1,0 +1,29 @@
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Database
+instance/*.db
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Reports
+reports/*.pdf
+
+# Temporary files
+*.tmp
+
+# pdf and pictures
+*.pdf
+*.png
