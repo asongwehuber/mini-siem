@@ -151,6 +151,38 @@
 
     </div>
 
+
+    <!-- AI CHAT BOX -->
+    <div class="card chat-container">
+
+        <h2>🧠 SOC AI Assistant</h2>
+
+        <div id="chat-messages" class="chat-box"></div>
+
+        <div id="typing-indicator" class="typing hidden">
+            SOC AI is analyzing...
+        </div>
+
+        <div class="chat-input-row">
+
+            <input id="chat-input"
+                type="text"
+                placeholder="Ask about attacks, alerts, logs..."
+                onkeypress="handleEnter(event)" />
+
+            <button class="chat-send-btn" onclick="sendChat()">
+                Send
+            </button>
+
+        </div>
+
+    </div>
+
+    
+
+
+
+
     <!-- REPORTS CENTER -->
     <div class="card" style="margin-top:20px;">
 
@@ -193,6 +225,23 @@
     <source src="{{ url_for('static', filename='sounds/critical_alarm.mp3') }}"
             type="audio/mpeg">
 </audio>
+
+
+
+
+<div id="aiModal" class="modal">
+    <div class="modal-content">
+        <span onclick="closeModal()">&times;</span>
+
+        <h2>AI Alert Analysis</h2>
+
+        <div id="aiAnalysis">
+            Loading...
+        </div>
+    </div>
+</div>
+
+
 
 </body>
 </html>

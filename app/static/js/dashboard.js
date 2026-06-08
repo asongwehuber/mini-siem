@@ -215,6 +215,10 @@ async function loadDashboard() {
                     <button onclick="resolveAlert(${alert.id})">
                         Resolve Alert
                     </button>
+
+                    <button onclick="explainAlert(${alert.id})">
+                        🧠 Explain with AI
+                    </button>
                 `;
 
                 alertsList.appendChild(div);
@@ -297,8 +301,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadDashboard();
     loadQuarantinedHosts();
 
-    setInterval(loadDashboard, 5000);
-    setInterval(loadQuarantinedHosts, 5000);
+    setInterval(loadDashboard, 10000);
+    setInterval(loadQuarantinedHosts, 10000);
 
 });
 
@@ -413,6 +417,94 @@ async function loadQuarantinedHosts() {
     }
 }
 
+// =========================================
+// CHAT SYSTEM for ai
+// =========================================
+
+async function sendChat() {
+
+    const input = document.getElementById("chat-input");
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    // render USER bubble
+    addChatMessage("user", message);
+
+    input.value = "";
+
+    // typing indicator
+    showTyping(true);
+
+    try {
+
+        const response = await fetch("/ai/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+
+        showTyping(false);
+
+        // render AI bubble
+        addChatMessage("ai", data.response);
+
+    } catch (error) {
+
+        showTyping(false);
+
+        addChatMessage("ai", "⚠ AI service unavailable.");
+    }
+}
+
+//New message rendering bubble
+
+function addChatMessage(sender, text) {
+
+    const box = document.getElementById("chat-messages");
+
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("message", sender);
+
+    const bubble = document.createElement("div");
+    bubble.classList.add("bubble");
+    bubble.innerText = text;
+
+    wrapper.appendChild(bubble);
+    box.appendChild(wrapper);
+
+    box.scrollTop = box.scrollHeight;
+}
+
+
+
+
+//adding typing indicator
+
+function showTyping(show) {
+
+    const typing = document.getElementById("typing-indicator");
+
+    if (!typing) return;
+
+    if (show) {
+        typing.classList.remove("hidden");
+    } else {
+        typing.classList.add("hidden");
+    }
+}
+
+//enter key support
+function handleEnter(event) {
+    if (event.key === "Enter") {
+        sendChat();
+    }
+}
+
 
 
 
@@ -460,3 +552,38 @@ async function loadReportStats() {
 
 // Load stats when dashboard opens
 loadReportStats();
+
+
+async function explainAlert(alertId) {
+
+    document.getElementById("aiModal").style.display = "block";
+
+    document.getElementById("aiAnalysis").innerHTML =
+        "🧠 Analyzing alert...";
+
+    try {
+
+        const response = await fetch(
+            `/ai/alert/${alertId}/explain`
+        );
+
+        const data = await response.json();
+
+        document.getElementById("aiAnalysis").innerText =
+            data.explanation;
+
+    } catch (error) {
+
+        document.getElementById("aiAnalysis").innerText =
+            "Failed to get AI analysis.";
+
+        console.error(error);
+    }
+}
+
+
+function closeModal() {
+    document.getElementById("aiModal").style.display = "none";
+}
+
+

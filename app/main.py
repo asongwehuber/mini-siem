@@ -2,11 +2,14 @@ from flask import Flask
 from app.extensions import db, mail
 from app.routes.log_routes import log_bp
 from app.routes.report_routes import report_bp
+from app.routes.ai import ai_bp
+from app.routes.chat import chat_bp
 
 
 def create_app():
 
     app = Flask(__name__)
+    
 
     # DATABASE CONFIG
     app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -30,5 +33,7 @@ def create_app():
     # BLUEPRINTS
     app.register_blueprint(log_bp)
     app.register_blueprint(report_bp)
+    app.register_blueprint(chat_bp)
+    app.register_blueprint(ai_bp, url_prefix="/ai")
 
     return app
