@@ -29,7 +29,7 @@ def format_time(dt):
         tzinfo=ZoneInfo("UTC")
     ).astimezone(
         ZoneInfo("Africa/Douala")
-    ).strftime("%Y-%m-%d %H:%M:%S")
+    ).strftime("%d-%m-%y %H:%M:%S")
 
 
 # =========================================

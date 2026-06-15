@@ -2,6 +2,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Image
 import os
+import uuid 
 
 from app.reporting.chart_generator import generate_severity_chart
 
@@ -145,7 +146,7 @@ def create_pdf_report(data, filename):
     )
 
     # Severity Chart
-    chart_file = "severity_chart.png"
+    chart_file = f"severity_chart_{uuid.uuid4().hex}.png"
 
     generate_severity_chart(
         data,

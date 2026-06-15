@@ -96,7 +96,7 @@ def generate_report_data(report_type="daily"):
 
         "recent_alerts": [
             {
-                "timestamp": a.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                "timestamp": a.timestamp.strftime("%d-%m-%Y %H:%M:%S")
                 if a.timestamp else "N/A",
                 "name": a.alert_name or "Unknown Alert",
                 "severity": a.severity or "Unknown"
