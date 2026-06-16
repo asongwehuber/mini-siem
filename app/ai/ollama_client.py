@@ -1,8 +1,12 @@
 import requests
+import re
 
 OLLAMA_URL = "http://localhost:11434"
 MODEL = "qwen3:8b"
 
+def clean_response(text):
+    text = re.sub(r"[*#`_]+", "", text)
+    return text.strip()
 
 def ask_ai(prompt):
     try:
@@ -18,7 +22,8 @@ def ask_ai(prompt):
 
         response.raise_for_status()
 
-        return response.json()["response"]
+        answer = response.json()["response"]
+        return clean_response(answer)
 
     except Exception as e:
         return f"AI Error: {str(e)}"

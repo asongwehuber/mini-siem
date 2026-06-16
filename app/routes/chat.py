@@ -7,29 +7,46 @@ chat_bp = Blueprint("chat", __name__)
 @chat_bp.route("/ai/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    message = data.get("message", "")
-
+    message = data.get("message", "").strip()
+    if not message:
+        return jsonify({
+            "response": "please enter a question"
+        })
     context = build_siem_context()
 
     prompt = f"""
-    You are an expert SOC analyst integrated into a SIEM platform.
+    You are CyberShield AI, an intelligent cybersecurity assistant
+    integrated into a Security Information and Event Management (SIEM) platform.
 
-    Current SIEM data:
+    You have two responsibilities:
 
+    1. SIEM Analysis
+    - Analyze alerts, logs, attacks, reports and quarantined hosts.
+    - Answer questions using the SIEM data provided below.
+    - Explain alerts and suspicious activities.
+    - Provide recommendations for mitigation and incident response.
+
+    2. Cybersecurity Knowledge Assistant
+    - Answer general cybersecurity questions.
+    - Explain attacks, malware, networking, cryptography and security concepts.
+    - Provide best practices and defensive recommendations.
+    - Assist with cybersecurity learning and awareness.
+
+    SIEM Context:
     {context}
 
-    User question:
-
+    User Question:
     {message}
 
-    Instructions:
-
-    Instructions:
-    - You have access to live SIEM statistics.
-    - Use the provided SIEM data whenever possible.
-    - If a statistic is present in the context, answer directly using that data.
-    - If the information is not available in the context, clearly state that it is unavailable.
-    - For cybersecurity concepts, answer as a SOC analyst.
+    Rules:
+    - If the question concerns SIEM data, use the provided context.
+    - If the answer exists in the context, answer directly using the data.
+    - If the requested SIEM information is not available, clearly state that it is unavailable.
+    - If the question is a general cybersecurity question, answer using your cybersecurity knowledge.
+    - If the question is unrelated to cybersecurity, politely answer it as a general AI assistant.
+    - Keep responses concise and professional.
+    - Do NOT use markdown formatting such as #, ##, *, **, or bullet points.
+    - Return plain readable text only.
     """
 
     response = ask_ai(prompt)
