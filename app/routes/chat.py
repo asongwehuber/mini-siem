@@ -4,50 +4,70 @@ from app.ai.ollama_client import ask_ai
 
 chat_bp = Blueprint("chat", __name__)
 
+
+def needs_siem_context(message: str) -> bool:
+    """
+    Decide whether SIEM context is required.
+    """
+    keywords = [
+        "alert", "alerts", "log", "logs", "attack", "intrusion",
+        "quarantine", "host", "ip", "incident", "risk", "severity",
+        "brute", "scan", "malware", "breach", "incident", "threat"
+    ]
+    msg = message.lower()
+    return any(k in msg for k in keywords)
+
+
 @chat_bp.route("/ai/chat", methods=["POST"])
 def chat():
-    data = request.get_json()
+    data = request.get_json() or {}
+
     message = data.get("message", "").strip()
+
     if not message:
         return jsonify({
-            "response": "please enter a question"
+            "response": "Please enter a question"
         })
-    context = build_siem_context()
 
+    # =========================
+    # SMART CONTEXT LOADING
+    # =========================
+    context = ""
+
+    if needs_siem_context(message):
+        context = build_siem_context()
+
+        MAX_CONTEXT_CHARS = 7000
+        if len(context) > MAX_CONTEXT_CHARS:
+            context = context[:MAX_CONTEXT_CHARS].rsplit("\n", 1)[0]
+            context += "\n[TRUNCATED]"
+
+    # =========================
+    # PROMPT
+    # =========================
     prompt = f"""
-    You are CyberShield AI, an intelligent cybersecurity assistant
-    integrated into a Security Information and Event Management (SIEM) platform.
+You are CyberShield AI, a cybersecurity assistant integrated into a SIEM platform.
 
-    You have two responsibilities:
+RULE:
+- Use SIEM context only if provided
+- Otherwise answer as a cybersecurity expert
 
-    1. SIEM Analysis
-    - Analyze alerts, logs, attacks, reports and quarantined hosts.
-    - Answer questions using the SIEM data provided below.
-    - Explain alerts and suspicious activities.
-    - Provide recommendations for mitigation and incident response.
+SIEM CONTEXT:
+{context if context else "No SIEM context required."}
 
-    2. Cybersecurity Knowledge Assistant
-    - Answer general cybersecurity questions.
-    - Explain attacks, malware, networking, cryptography and security concepts.
-    - Provide best practices and defensive recommendations.
-    - Assist with cybersecurity learning and awareness.
+USER QUESTION:
+{message}
 
-    SIEM Context:
-    {context}
+RULES:
+- Be concise and professional
+- Use SIEM data only when present
+- If data is missing, say so clearly
+- No markdown, no symbols, no formatting
+- Plain text only
+"""
 
-    User Question:
-    {message}
-
-    Rules:
-    - If the question concerns SIEM data, use the provided context.
-    - If the answer exists in the context, answer directly using the data.
-    - If the requested SIEM information is not available, clearly state that it is unavailable.
-    - If the question is a general cybersecurity question, answer using your cybersecurity knowledge.
-    - If the question is unrelated to cybersecurity, politely answer it as a general AI assistant.
-    - Keep responses concise and professional.
-    - Do NOT use markdown formatting such as #, ##, *, **, or bullet points.
-    - Return plain readable text only.
-    """
+    # HARD SAFETY LIMIT (prevents Ollama crash)
+    prompt = prompt[:10000]
 
     response = ask_ai(prompt)
 

@@ -1,14 +1,34 @@
 from app.database.models import Log, Alert, QuarantinedHost
-from sqlalchemy import func
+
+
+# =========================
+# CRITICAL ALERT SUMMARY (LIGHTWEIGHT)
+# =========================
+def get_critical_alert_summary(limit=3):
+    alerts = (
+        Alert.query
+        .filter_by(severity="CRITICAL")
+        .order_by(Alert.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+
+    if not alerts:
+        return "No critical alerts"
+
+    return "\n".join(
+        f"{a.alert_name} | {a.source_ip} | {a.status}"
+        for a in alerts
+    )
 
 
 def build_siem_context() -> str:
     """
-    Builds SIEM context with attack pattern labeling and risk scoring.
+    Lightweight SIEM context optimized for LLM performance.
     """
 
     # =========================
-    # BASIC METRICS
+    # METRICS
     # =========================
     total_logs = Log.query.count()
     total_alerts = Alert.query.count()
@@ -26,49 +46,41 @@ def build_siem_context() -> str:
     ).count()
 
     # =========================
-    # ATTACK PATTERN DETECTION (RULE-BASED)
+    # ATTACK PATTERNS (LIMITED)
     # =========================
     patterns = []
 
-    # Brute force detection
     if open_alerts > 10 and critical_alerts > 3:
-        patterns.append("Possible BRUTE FORCE ATTACK")
+        patterns.append("BRUTE FORCE")
 
-    # High severity spike
     if critical_alerts > 5:
-        patterns.append("CRITICAL ALERT SPIKE (possible active intrusion)")
+        patterns.append("CRITICAL SPIKE")
 
-    # Suspicious scanning behavior
     if total_alerts > 50 and high_alerts > medium_alerts:
-        patterns.append("POSSIBLE NETWORK SCANNING ACTIVITY")
+        patterns.append("SCANNING ACTIVITY")
 
-    # Quarantine indication
     if quarantined_hosts > 0:
-        patterns.append("MALICIOUS HOSTS QUARANTINED")
+        patterns.append("HOSTS QUARANTINED")
 
     if not patterns:
-        patterns.append("No clear attack pattern detected")
+        patterns.append("NO PATTERN")
+
+    # keep only top 3 patterns (VERY IMPORTANT)
+    patterns = patterns[:3]
 
     # =========================
-    # RISK SCORE CALCULATION (0–100)
+    # RISK SCORE
     # =========================
-    risk_score = 0
+    risk_score = (
+        critical_alerts * 5 +
+        high_alerts * 3 +
+        medium_alerts +
+        open_alerts * 2 +
+        quarantined_hosts * 10
+    )
 
-    # severity weight
-    risk_score += critical_alerts * 5
-    risk_score += high_alerts * 3
-    risk_score += medium_alerts * 1
-
-    # open alerts increase risk
-    risk_score += open_alerts * 2
-
-    # quarantined hosts strongly increase risk
-    risk_score += quarantined_hosts * 10
-
-    # cap score
     risk_score = min(risk_score, 100)
 
-    # risk level interpretation
     if risk_score >= 75:
         risk_level = "HIGH"
     elif risk_score >= 40:
@@ -77,51 +89,34 @@ def build_siem_context() -> str:
         risk_level = "LOW"
 
     # =========================
-    # RECENT ALERTS
+    # CRITICAL ALERTS ONLY (LIMITED)
     # =========================
-    recent_alerts = (
-        Alert.query
-        .order_by(Alert.timestamp.desc())
-        .limit(10)
-        .all()
-    )
-
-    alert_summary = "\n".join(
-        f"- {a.timestamp} | {a.alert_name} | {a.severity} | {a.source_ip} | {a.status}"
-        for a in recent_alerts
-    ) if recent_alerts else "No recent alerts."
+    critical_summary = get_critical_alert_summary(3)
 
     # =========================
-    # CONTEXT OUTPUT
+    # FINAL CONTEXT (MINIMAL FORMAT)
     # =========================
     context = f"""
-==================== SYSTEM STATUS ====================
+SYSTEM
+Logs={total_logs}
+Alerts={total_alerts}
 
-Total Logs: {total_logs}
-Total Alerts: {total_alerts}
+STATUS
+Open={open_alerts}
+Closed={closed_alerts}
 
-Alert Breakdown:
-- Open: {open_alerts}
-- Closed: {closed_alerts}
+SEVERITY
+C={critical_alerts} H={high_alerts} M={medium_alerts} L={low_alerts}
 
-Severity Breakdown:
-- Critical: {critical_alerts}
-- High: {high_alerts}
-- Medium: {medium_alerts}
-- Low: {low_alerts}
+RISK
+Score={risk_score}/100
+Level={risk_level}
 
-Quarantined Hosts: {quarantined_hosts}
+PATTERNS
+{", ".join(patterns)}
 
-==================== SECURITY ANALYSIS ====================
-
-Risk Score: {risk_score}/100
-Risk Level: {risk_level}
-
-Detected Attack Patterns:
-- {chr(10).join(patterns)}
-
-==================== RECENT ALERTS ====================
-{alert_summary}
+CRITICAL
+{critical_summary}
 """
 
     return context.strip()
