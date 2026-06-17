@@ -4,6 +4,7 @@ from flask_mail import Message
 from app.extensions import mail
 from app.extensions import db
 from app.database.models import Log, Alert
+from app.notifications.email_alert import send_alert_email
 
 
 # =========================================
@@ -14,43 +15,6 @@ def normalize_severity(sev):
         return "low"
     return sev.lower()
 
-
-# =========================================
-# EMAIL ALERT
-# =========================================
-def send_alert_email(alert):
-
-    try:
-        msg = Message(
-            subject=f"🚨 Mini-SIEM Alert: {alert.alert_name}",
-            recipients=["huber.asongwe@gmail.com",
-                       # "reinette.mengue@compost.cm"  do not remove this mail, I will uncomment it later
-                       # "reinettemengue@gmail.com"   do not remove this mail, I will uncomment it later
-                        
-                        ]
-        )
-
-        msg.body = f"""
-ALERT GENERATED
-
-Alert Name: {alert.alert_name}
-Severity: {alert.severity}
-Source IP: {alert.source_ip}
-Event Count: {alert.event_count}
-
-Description:
-{alert.description}
-
-Timestamp:
-{alert.timestamp}
-"""
-
-        mail.send(msg)
-
-        print(f"[EMAIL] Sent for {alert.alert_name}")
-
-    except Exception as e:
-        print(f"[EMAIL ERROR] {e}")
 
 
 # =========================================

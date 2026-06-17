@@ -1,55 +1,43 @@
 from flask_mail import Message
+from app.extensions import mail
+from zoneinfo import ZoneInfo
 
 
-def send_alert_email(mail, alert):
 
-    try:
 
-        subject = f"[SIEM ALERT] {alert.alert_name}"
 
-        body = f"""
-Security Alert Generated
+ALERT_RECIPIENTS = [
+    "huber.asongwe@gmail.com",
+    # "reinette.mengue@campost.cm",
+    # "reinettemengue@gmail.com"
+]
 
-Alert Name:
-{alert.alert_name}
+def send_alert_email(alert):
 
-Severity:
-{alert.severity}
+    local_time = alert.timestamp.replace(
+        tzinfo=ZoneInfo("UTC")
+    ).astimezone(
+        ZoneInfo("Africa/Douala")
+    )
 
-Source IP:
-{alert.source_ip}
+    msg = Message(
+        subject=f"🚨 Mini-SIEM Alert: {alert.alert_name}",
+        recipients=ALERT_RECIPIENTS
+    )
+
+    msg.body = f"""
+ALERT GENERATED
+
+Alert Name: {alert.alert_name}
+Severity: {alert.severity}
+Source IP: {alert.source_ip}
+Event Count: {alert.event_count}
 
 Description:
 {alert.description}
 
-Event Count:
-{alert.event_count}
-
-Status:
-{alert.status}
-
 Timestamp:
-{alert.timestamp}
-
-----------------------------------
-Mini-SIEM Notification System
+{local_time.strftime('%d-%m-%Y %H:%M:%S ')}
 """
 
-        msg = Message(
-            subject=subject,
-            recipients=["huber.asongwe@gmail.com"]
-        )
-
-        msg.body = body
-
-        mail.send(msg)
-
-        print(
-            f"[EMAIL] Alert notification sent for {alert.alert_name}"
-        )
-
-    except Exception as e:
-
-        print(
-            f"[EMAIL ERROR] {str(e)}"
-        )
+    mail.send(msg)
