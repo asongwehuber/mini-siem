@@ -10,8 +10,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-print("MAIL_USERNAME =", os.getenv("MAIL_USERNAME"))
-print("MAIL_PASSWORD =", os.getenv("MAIL_PASSWORD"))
 
 def create_app():
 
