@@ -45,12 +45,16 @@ The objective of the project is to demonstrate the core functionalities of a SIE
 ### Notifications
 - Email alert notifications
 - Security incident reporting
+- Telegram alert notification
+- Telegram voice notification for critical alert
+- SMS notification for critical alert
+- IVR (interactive voice response) for critical alerts
 
 
 
 ## System Architecture
 
-```text
+
 +--------------------+
 | Log Sources        |
 | Endpoints          |

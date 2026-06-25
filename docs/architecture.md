@@ -274,6 +274,9 @@ Provide immediate awareness of security incidents.
 ### Features
 
 * Email alerts.
+* Telegram message and voice alerts
+* SMS alert for offline purposes
+* IVR for immidiate action
 * Incident notifications.
 * Security summaries.
 
@@ -457,7 +460,7 @@ Future versions of the platform may include:
 * Distributed log collectors.
 * Machine Learning-based anomaly detection.
 
----
+
 
 # Conclusion
 

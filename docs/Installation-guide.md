@@ -88,6 +88,17 @@ MAIL_PORT=587
 MAIL_USERNAME=your_gmail@gmail.com
 MAIL_PASSWORD=your_gmail_app_password
 MAIL_DEFAULT_SENDER=your_gmail@gmail.com
+
+
+#TELEGRAM CONFIGURATION
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+
+#SMS NOTIFICATION FOR ORANGE CAMEROON
+ORANGE_SMS_URL=https://your-orange-api-endpoint
+ORANGE_SMS_USER=your_username
+ORANGE_SMS_PASS=your_password
+ORANGE_SMS_SENDER=MINISIEM
 ```
 
 > ⚠️ Ensure that `.env` is excluded from version control using `.gitignore`.
@@ -147,12 +158,14 @@ Download Ollama:
 
 👉 [https://ollama.com](https://ollama.com)
 
+it should be noted that Ollama model qwen3:8b was use for this project.
+Ollama version 0.30.7
+
 Pull required model:
 
 ```bash
 ollama pull llama3
 ```
-
 Start Ollama service:
 
 ```bash
