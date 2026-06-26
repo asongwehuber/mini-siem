@@ -1,43 +1,62 @@
-# Virtual environments
+# =========================
+# VIRTUAL ENVIRONMENTS
+# =========================
 venv/
 .venv/
 
-# Python cache
+# =========================
+# PYTHON CACHE
+# =========================
 __pycache__/
 *.pyc
 
-# Environment variables
+# =========================
+# ENVIRONMENT VARIABLES
+# =========================
 .env
 
-# Database
+# =========================
+# DATABASE
+# =========================
 instance/*.db
 
-# Logs
+# =========================
+# LOG FILES
+# =========================
 *.log
 
-# VS Code
+# =========================
+# IDE / EDITOR
+# =========================
 .vscode/
 
-# Reports
+# =========================
+# REPORTS / OUTPUT FILES
+# =========================
 reports/*.pdf
-
-# Temporary files
-*.tmp
-
-# pdf and pictures
 *.pdf
 *.png
+
+# =========================
+# GEOIP DATABASES (MAXMIND)
+# =========================
 geoip/
 geoip.tar.gz
 GeoLite2-City_20260623/
-test_geo.py
-test_
 
 # =========================
-# TEST FILES (SIEM PROJECT)
+# TEST FILES
 # =========================
+test_*.py
+
+# (optional explicit listing - redundant but harmless)
 test_ai.py
 test_telegram.py
 test_voice_alert.py
 test_pdf.py
 test_geo.py
+
+# =========================
+# TEMP FILES
+# =========================
+*.tmp
