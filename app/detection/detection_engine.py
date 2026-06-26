@@ -4,6 +4,31 @@ from app.extensions import db
 from app.database.models import Log, Alert
 from app.notifications.alert_dispatcher import dispatch_alert
 from app.response.quarantine import quarantine_host
+from app.attack_map.geolocation import locate_ip
+
+
+# =========================================
+# GEO ENRICHMENT HELPER
+# =========================================
+
+def enrich_ip(ip):
+
+    try:
+        # Detect private IPs first
+        if ip.startswith("192.168.") or ip.startswith("10.") or ip.startswith("172."):
+            return {
+                "city": "Internal Network",
+                "country": "LAN"
+            }
+
+        return locate_ip(ip)
+
+    except Exception as e:
+        return {
+            "city": "Unknown",
+            "country": "Unknown",
+            "error": str(e)
+        }
 
 
 # =========================================
@@ -58,6 +83,8 @@ def detect_brute_force(source_ip):
     if failed_logins < 5:
         return
 
+    geo = enrich_ip(source_ip)
+
     existing_alert = Alert.query.filter_by(
         source_ip=source_ip,
         alert_name="Brute Force Attack",
@@ -67,9 +94,7 @@ def detect_brute_force(source_ip):
     if existing_alert:
 
         existing_alert.event_count += 1
-
         update_alert_severity(existing_alert)
-
         return
 
     alert = Alert(
@@ -84,6 +109,7 @@ def detect_brute_force(source_ip):
     db.session.add(alert)
     db.session.commit()
 
+    alert.geo = geo
     dispatch_alert(alert)
 
 
@@ -111,6 +137,8 @@ def detect_port_scan(source_ip):
     if len(unique_ports) < 5:
         return
 
+    geo = enrich_ip(source_ip)
+
     existing_alert = Alert.query.filter_by(
         source_ip=source_ip,
         alert_name="Possible Port Scan",
@@ -120,9 +148,7 @@ def detect_port_scan(source_ip):
     if existing_alert:
 
         existing_alert.event_count += 1
-
         update_alert_severity(existing_alert)
-
         return
 
     alert = Alert(
@@ -137,6 +163,7 @@ def detect_port_scan(source_ip):
     db.session.add(alert)
     db.session.commit()
 
+    alert.geo = geo
     dispatch_alert(alert)
 
 
@@ -159,6 +186,8 @@ def detect_high_severity_incident(source_ip, hostname):
     if len(high_logs) < 3:
         return
 
+    geo = enrich_ip(source_ip)
+
     existing_alert = Alert.query.filter_by(
         source_ip=source_ip,
         alert_name="Critical Security Incident",
@@ -168,9 +197,7 @@ def detect_high_severity_incident(source_ip, hostname):
     if existing_alert:
 
         existing_alert.event_count += 1
-
         update_alert_severity(existing_alert)
-
         return
 
     alert = Alert(
@@ -185,6 +212,7 @@ def detect_high_severity_incident(source_ip, hostname):
     db.session.add(alert)
     db.session.commit()
 
+    alert.geo = geo
     dispatch_alert(alert)
 
     quarantine_host(

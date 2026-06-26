@@ -1,5 +1,4 @@
 import logging
-
 from app.notifications.ivr.simulated_ivr import ivr_provider
 
 logging.basicConfig(
@@ -12,26 +11,63 @@ SOC_PHONES = [
 ]
 
 
-def make_call(phone, alert):
+# =========================================
+# FORMAT IVR MESSAGE (IMPORTANT FIX)
+# =========================================
 
-    success = ivr_provider.make_call(
-        phone,
-        alert
+def build_ivr_message(alert):
+
+    geo = getattr(alert, "geo", None)
+
+    location_text = "Unknown"
+
+    if geo and isinstance(geo, dict):
+        city = geo.get("city", "Unknown")
+        country = geo.get("country", "Unknown")
+        location_text = f"{city}, {country}"
+
+    return (
+        f"Critical Security Alert. "
+        f"Alert: {alert.alert_name}. "
+        f"Source IP: {alert.source_ip}. "
+        f"Location: {location_text}. "
+        f"Severity: {str(alert.severity).upper()}. "
+        f"Please respond immediately."
     )
 
-    if success:
-        logging.info(
-            f"IVR call placed to {phone}"
+
+# =========================================
+# MAKE CALL
+# =========================================
+
+def make_call(phone, message):
+
+    try:
+        success = ivr_provider.make_call(
+            phone,
+            message
         )
 
-    return success
+        if success:
+            logging.info(f"IVR call placed to {phone}")
+        else:
+            logging.error(f"IVR call failed to {phone}")
 
+        return success
+
+    except Exception as e:
+        logging.error(f"IVR exception for {phone}: {e}")
+        return False
+
+
+# =========================================
+# DISPATCH IVR ALERT
+# =========================================
 
 def send_alert_ivr(alert):
 
+    message = build_ivr_message(alert)
+
     for phone in SOC_PHONES:
 
-        make_call(
-            phone,
-            alert
-        )
+        make_call(phone, message)

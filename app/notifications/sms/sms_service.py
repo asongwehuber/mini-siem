@@ -20,11 +20,21 @@ SOC_PHONES = [
 
 def build_sms_message(alert):
 
+    geo = getattr(alert, "geo", None)
+
+    location_text = "Unknown"
+
+    if geo and isinstance(geo, dict):
+        city = geo.get("city", "Unknown")
+        country = geo.get("country", "Unknown")
+        location_text = f"{city}, {country}"
+
     return (
         f"MINI-SIEM ALERT\n"
         f"Alert: {alert.alert_name}\n"
         f"IP: {alert.source_ip}\n"
-        f"Severity: {alert.severity.upper()}"
+        f"Location: {location_text}\n"
+        f"Severity: {str(alert.severity).upper()}"
     )
 
 

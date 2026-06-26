@@ -87,3 +87,24 @@ class QuarantinedHost(db.Model):
 
     def __repr__(self):
         return f"<QuarantinedHost {self.source_ip}>"
+    
+
+class AttackLocation(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    timestamp = db.Column(db.DateTime)
+
+    source_ip = db.Column(db.String(50))
+
+    country = db.Column(db.String(100))
+
+    city = db.Column(db.String(100))
+
+    latitude = db.Column(db.Float)
+
+    longitude = db.Column(db.Float)
+
+    attack_type = db.Column(db.String(100))
+
+    severity = db.Column(db.String(20))
