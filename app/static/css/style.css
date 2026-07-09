@@ -343,3 +343,260 @@ button:hover {
     cursor: pointer;
     font-size: 28px;
 }
+
+
+
+/* =======================================================
+   ADMINISTRATOR MODULE ONLY
+   This section affects only admin pages
+======================================================= */
+
+.admin-page {
+
+    width: 100%;
+
+}
+
+
+/* Main administrator container */
+
+.admin-page .admin-container {
+
+    width: 90%;
+
+    max-width: 1200px;
+
+    margin: 30px auto;
+
+}
+
+
+/* Administrator cards */
+
+.admin-page .admin-card {
+
+    background: rgba(255,255,255,0.05);
+
+    padding: 25px;
+
+    border-radius: 10px;
+
+}
+
+
+/* Administrator headings */
+
+.admin-page h1 {
+
+    text-align: center;
+
+    margin-bottom: 25px;
+
+}
+
+
+/* Administrator tables */
+
+.admin-page .admin-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 20px;
+
+}
+
+
+.admin-page .admin-table th {
+
+    padding: 12px;
+
+    text-align: left;
+
+}
+
+
+.admin-page .admin-table td {
+
+    padding: 12px;
+
+}
+
+/* SECURITY ACTION BUTTON */
+
+.admin-page .admin-btn-security {
+
+    background: #6f42c1;
+
+    color: white;
+
+}
+
+
+.admin-page .admin-btn-security:hover {
+
+    opacity: 0.85;
+
+}
+
+
+/* Buttons */
+
+.admin-page .admin-btn {
+
+    display: inline-block;
+
+    padding: 10px 15px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+
+    font-weight: bold;
+
+}
+
+
+.admin-page .admin-btn-primary {
+
+    background: #007bff;
+
+    color: white;
+
+}
+
+
+.admin-page .admin-btn-success {
+
+    background: #28a745;
+
+    color: white;
+
+}
+
+
+.admin-page .admin-btn-secondary {
+
+    background: #6c757d;
+
+    color: white;
+
+}
+
+
+/* Forms */
+
+.admin-page .admin-form {
+
+    max-width: 600px;
+
+    margin: auto;
+
+}
+
+
+.admin-page .admin-form input,
+
+.admin-page .admin-form select {
+
+    width: 100%;
+
+    padding: 10px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.admin-page .admin-form label {
+
+    font-weight: bold;
+
+}
+
+
+/* Status */
+
+.admin-page .active {
+
+    color: #28a745;
+
+    font-weight: bold;
+
+}
+
+
+.admin-page .disabled {
+
+    color: #dc3545;
+
+    font-weight: bold;
+
+}
+
+/* FLASH MESSAGES */
+
+.admin-page .flash {
+
+    padding: 12px;
+
+    margin-bottom: 20px;
+
+    border-radius: 6px;
+
+    text-align: center;
+
+    font-weight: bold;
+
+}
+
+
+.admin-page .flash.success {
+
+    background: rgba(40,167,69,0.2);
+
+    color: #28a745;
+
+}
+
+
+.admin-page .flash.danger {
+
+    background: rgba(220,53,69,0.2);
+
+    color: #dc3545;
+
+}
+
+
+/* SHOW PASSWORD CHECKBOX */
+
+.admin-page .show-password {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    margin-top: 8px;
+
+    margin-bottom: 15px;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+}
+
+
+.admin-page .show-password input {
+
+    width: auto;
+
+    margin: 0 6px 0 0;
+
+    cursor: pointer;
+
+}

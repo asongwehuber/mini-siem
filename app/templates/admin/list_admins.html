@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Administrator Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="admin-page">
+
+
+<div class="admin-container">
+
+
+<div class="admin-card">
+
+
+<h1>
+    Administrator Management
+</h1>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+{% if messages %}
+
+{% for category, message in messages %}
+
+<div class="flash {{ category }}">
+
+{{ message }}
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+
+<div style="text-align:right; margin-bottom:20px;">
+
+
+<a href="{{ url_for('auth.create_admin') }}"
+   class="admin-btn admin-btn-primary">
+
+    ➕ Create Administrator
+
+</a>
+
+
+</div>
+
+
+
+<table class="admin-table">
+
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Full Name</th>
+
+<th>Email</th>
+
+<th>Role</th>
+
+<th>Status</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+
+
+<tbody>
+
+
+{% for admin in admins %}
+
+
+<tr>
+
+
+<td>
+{{ admin.id }}
+</td>
+
+
+
+<td>
+{{ admin.fullname }}
+</td>
+
+
+
+<td>
+{{ admin.email }}
+</td>
+
+
+
+<td>
+
+{% if admin.role == "super_admin" %}
+
+Super Administrator
+
+{% else %}
+
+Administrator
+
+{% endif %}
+
+
+</td>
+
+
+
+
+<td>
+
+
+{% if admin.is_active %}
+
+<span class="active">
+🟢 Active
+</span>
+
+
+{% else %}
+
+
+<span class="disabled">
+🔴 Disabled
+</span>
+
+
+{% endif %}
+
+
+</td>
+
+<td>
+
+
+<a href="{{ url_for('auth.edit_admin', admin_id=admin.id) }}"
+   class="admin-btn admin-btn-success">
+
+Edit
+
+</a>
+
+
+
+<a href="{{ url_for('auth.change_admin_password', admin_id=admin.id) }}"
+   class="admin-btn admin-btn-security">
+
+Change Password
+
+</a>
+
+
+
+{% if admin.is_active %}
+
+<a href="{{ url_for('auth.toggle_admin', admin_id=admin.id) }}"
+   class="admin-btn admin-btn-secondary">
+
+Disable
+
+</a>
+
+
+{% else %}
+
+
+<a href="{{ url_for('auth.toggle_admin', admin_id=admin.id) }}"
+   class="admin-btn admin-btn-primary">
+
+Enable
+
+</a>
+
+
+{% endif %}
+
+
+
+</td>
+
+
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+
+</table>
+
+
+
+<br>
+
+
+<a href="{{ url_for('log_bp.dashboard') }}"
+   class="admin-btn admin-btn-secondary">
+
+← Back to SIEM Dashboard
+
+</a>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</body>
+
+
+</html>

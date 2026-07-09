@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>SIEM Login</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="admin-page">
+
+
+<div class="admin-container">
+
+
+<div class="admin-card">
+
+
+<h1>
+Mini SIEM Login
+</h1>
+
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+{% if messages %}
+
+{% for category, message in messages %}
+
+<div class="flash {{ category }}">
+
+{{ message }}
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+
+
+
+
+<form method="POST"
+      class="admin-form">
+
+
+
+<label>
+Email
+</label>
+
+<input
+type="email"
+name="email"
+required>
+
+
+
+
+<label>
+Password
+</label>
+
+
+<input
+id="login_password"
+type="password"
+name="password"
+required>
+
+
+
+
+<label class="show-password">
+
+<input
+type="checkbox"
+onchange="togglePassword('login_password', this)">
+
+Show Password
+
+</label>
+
+
+
+
+<button type="submit"
+        class="admin-btn admin-btn-primary">
+
+Login
+
+</button>
+
+
+
+</form>
+
+
+
+<br>
+
+
+
+<a href="#"
+   class="admin-btn admin-btn-secondary">
+
+Forgot Password?
+
+</a>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<script>
+
+function togglePassword(id, checkbox){
+
+    let field = document.getElementById(id);
+
+
+    if(checkbox.checked){
+
+        field.type = "text";
+
+    }
+
+    else{
+
+        field.type = "password";
+
+    }
+
+}
+
+</script>
+
+
+
+
+</body>
+
+
+</html>

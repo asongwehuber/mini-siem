@@ -1,9 +1,10 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from zoneinfo import ZoneInfo
 from flask_mail import Message
 from app.extensions import db, mail
 from app.database.models import Log, Alert, QuarantinedHost
 from app.response.quarantine import quarantine_host
+from flask_login import login_required
 
 from app.detection.detection_engine import (
     detect_brute_force,
@@ -11,6 +12,8 @@ from app.detection.detection_engine import (
     detect_high_severity_incident
 )
 
+
+    
 # =========================================
 # BLUEPRINT
 # =========================================
@@ -33,13 +36,20 @@ def format_time(dt):
 
 
 # =========================================
-# DASHBOARD HOME
+# login HOME
 # =========================================
 @log_bp.route('/')
+def home():
+    return redirect(url_for('auth.login'))
+
+
+# =========================================
+# dashboard
+# =========================================
+@log_bp.route('/dashboard')
+@login_required
 def dashboard():
-
     return render_template('dashboard.html')
-
 
 
 
@@ -48,6 +58,7 @@ def dashboard():
 # =========================================
 @log_bp.route('/submit-log', methods=['POST'])
 def submit_log():
+    
 
     try:
 
@@ -136,6 +147,7 @@ def submit_log():
 # GET ALL LOGS
 # =========================================
 @log_bp.route('/logs', methods=['GET'])
+@login_required
 def get_logs():
 
     try:
@@ -173,6 +185,7 @@ def get_logs():
 # GET SINGLE LOG
 # =========================================
 @log_bp.route('/log/<int:log_id>', methods=['GET'])
+@login_required
 def get_single_log(log_id):
 
     try:
@@ -208,6 +221,7 @@ def get_single_log(log_id):
 # GET ALERTS
 # =========================================
 @log_bp.route('/alerts', methods=['GET'])
+@login_required
 def get_alerts():
 
     try:
@@ -247,6 +261,7 @@ def get_alerts():
     '/resolve-alert/<int:alert_id>',
     methods=['POST']
 )
+@login_required
 def resolve_alert(alert_id):
 
     try:
@@ -280,6 +295,7 @@ def resolve_alert(alert_id):
 # SEARCH LOGS
 # =========================================
 @log_bp.route('/search', methods=['GET'])
+@login_required
 def search_logs():
 
     try:
@@ -337,6 +353,7 @@ def search_logs():
 # TOP ATTACKERS
 # =========================================
 @log_bp.route('/top-attackers', methods=['GET'])
+@login_required
 def top_attackers():
 
     try:
@@ -374,6 +391,7 @@ def top_attackers():
 
 
 @log_bp.route('/test-email')
+@login_required
 def test_email():
 
     try:
@@ -398,6 +416,7 @@ def test_email():
     
 
 @log_bp.route('/quarantined-hosts', methods=['GET'])
+@login_required
 def get_quarantined_hosts():
 
     hosts = QuarantinedHost.query.filter_by(
@@ -427,6 +446,7 @@ def get_quarantined_hosts():
 
 
 @log_bp.route('/test-quarantine')
+@login_required
 def test_quarantine():
 
     quarantine_host(
@@ -443,6 +463,7 @@ def test_quarantine():
     '/release-host/<int:host_id>',
     methods=['POST']
 )
+@login_required
 def release_host(host_id):
 
     try:
@@ -475,6 +496,7 @@ def release_host(host_id):
 
 
 @log_bp.route('/quarantined-hosts-summary')
+@login_required
 def get_quarantined_hosts_summary():
 
     total_hosts = QuarantinedHost.query.filter_by(

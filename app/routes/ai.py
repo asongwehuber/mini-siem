@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify
 from app.database.models import Alert
 from app.ai.ollama_client import ask_ai
+from flask_login import login_required
 
 ai_bp = Blueprint("ai", __name__)
 
 
 @ai_bp.route("/alert/<int:alert_id>/explain")
+@login_required
 def explain_alert(alert_id):
 
     alert = Alert.query.get_or_404(alert_id)
@@ -43,6 +45,7 @@ def explain_alert(alert_id):
 
 
 @ai_bp.route("/ask", methods=["POST"])
+@login_required
 def ask():
 
     data = request.get_json()

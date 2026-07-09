@@ -301,8 +301,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadDashboard();
     loadQuarantinedHosts();
 
-    setInterval(loadDashboard, 10000);
-    setInterval(loadQuarantinedHosts, 10000);
+    setInterval(loadDashboard, 3000);
+    setInterval(loadQuarantinedHosts, 3000);
 
 });
 

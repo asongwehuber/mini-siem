@@ -23,6 +23,32 @@
 
 <div class="container">
 
+
+    <!-- TOP NAVIGATION -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+
+        <div>
+            {% if current_user.role == "super_admin" %}
+
+            <a href="{{ url_for('auth.admin_dashboard') }}"
+            style="color:white; text-decoration:none; font-weight:bold;">
+                👤 Administrator Management
+            </a>
+
+            {% endif %}
+        </div>
+
+        <div>
+
+            <a href="{{ url_for('auth.logout') }}"
+            style="color:white; text-decoration:none; font-weight:bold;">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </div>
+
     <h1>Mini SIEM Dashboard</h1>
 
     <!-- STATS -->

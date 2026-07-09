@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, send_file
+from flask_login import login_required 
 import os
 
 from app.reporting.report_generator import generate_report_data
@@ -12,6 +13,7 @@ report_bp = Blueprint("report_bp", __name__)
 # JSON REPORT (for dashboard/API)
 # =========================================
 @report_bp.route("/report")
+@login_required
 def generate_report():
 
     report_type = request.args.get("type", "daily")
@@ -25,6 +27,7 @@ def generate_report():
 # SIMPLE DAILY PDF DOWNLOAD
 # =========================================
 @report_bp.route("/reports/download")
+@login_required
 def download_daily_report():
 
     data = generate_report_data("daily")
@@ -47,6 +50,7 @@ def download_daily_report():
 # PARAMETERIZED PDF REPORT
 # =========================================
 @report_bp.route("/report/pdf")
+@login_required
 def download_report_pdf():
 
     report_type = request.args.get("type", "daily")
@@ -71,6 +75,7 @@ def download_report_pdf():
 # TEST ROUTE
 # =========================================
 @report_bp.route("/report-test")
+@login_required
 def report_test():
     return {
         "status": "success",
