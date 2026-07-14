@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Trust This Device</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="admin-page">
+
+<div class="admin-container">
+
+<div class="admin-card">
+
+<h1>
+Trust This Device
+</h1>
+
+<p style="text-align:center;">
+
+Choose how long this device should remain trusted.
+
+</p>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+{% if messages %}
+
+{% for category, message in messages %}
+
+<div class="flash {{ category }}">
+
+{{ message }}
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+<form method="POST"
+class="admin-form">
+
+<label>
+
+Trust Duration
+
+</label>
+
+<select
+name="duration"
+required>
+
+<option value="1">
+
+1 Day
+
+</option>
+
+<option value="7">
+
+7 Days
+
+</option>
+
+<option value="30">
+
+30 Days
+
+</option>
+
+{% if current_user.role == "super_admin" %}
+
+<option value="forever">
+
+Until Revoked
+
+</option>
+
+{% endif %}
+
+</select>
+
+<button
+type="submit"
+class="admin-btn admin-btn-primary">
+
+Trust Device
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

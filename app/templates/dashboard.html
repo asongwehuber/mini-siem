@@ -30,15 +30,30 @@
         <div>
             {% if current_user.role == "super_admin" %}
 
-            <a href="{{ url_for('auth.admin_dashboard') }}"
-            style="color:white; text-decoration:none; font-weight:bold;">
-                👤 Administrator Management
-            </a>
+            <div style="display:flex; gap:20px;">
+
+                <a href="{{ url_for('auth.admin_dashboard') }}"
+                style="color:white; text-decoration:none; font-weight:bold;">
+                    👤 Administrator Management
+                </a>
+
+
+                <a href="{{ url_for('auth.admin_trusted_devices') }}"
+                style="color:white; text-decoration:none; font-weight:bold;">
+                    🔐 Trusted Device Management
+                </a>
+
+            </div>
 
             {% endif %}
         </div>
 
-        <div>
+        <div style="display:flex; gap:20px; align-items:center;">
+
+            <a href="{{ url_for('auth.trusted_devices') }}"
+            style="color:white; text-decoration:none; font-weight:bold;">
+                💻 Trusted Devices ({{ trusted_count }})
+            </a>
 
             <a href="{{ url_for('auth.logout') }}"
             style="color:white; text-decoration:none; font-weight:bold;">

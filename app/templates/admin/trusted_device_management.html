@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+```
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Trusted Device Management</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+```
+
+</head>
+
+<body>
+
+<div class="admin-page">
+
+```
+<div class="admin-container">
+
+
+    <div class="admin-card">
+
+
+        <h1>
+            💻 Trusted Device Management
+        </h1>
+
+
+        <p>
+            Manage trusted devices belonging to all administrators.
+        </p>
+
+
+
+        <a href="{{ url_for('auth.admin_dashboard') }}"
+           class="admin-btn admin-btn-primary"
+           style="display:inline-block; margin-bottom:20px;">
+
+            ← Back to Administrator Management
+
+        </a>
+
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+
+
+
+        <table class="admin-table">
+
+
+            <thead>
+
+            <tr>
+
+                <th>
+                    Admin ID
+                </th>
+
+                <th>
+                    Device Name
+                </th>
+
+                <th>
+                    Browser
+                </th>
+
+                <th>
+                    Operating System
+                </th>
+
+                <th>
+                    IP Address
+                </th>
+
+                <th>
+                    Trusted Until
+                </th>
+
+                <th>
+                    Last Used
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+                <th>
+                    Action
+                </th>
+
+            </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+
+            {% if devices %}
+
+
+                {% for device in devices %}
+
+
+                <tr>
+
+
+                    <td>
+                        {{ device.admin_id }}
+                    </td>
+
+
+
+                    <td>
+                        {{ device.device_name }}
+                    </td>
+
+
+
+                    <td>
+                        {{ device.browser }}
+                    </td>
+
+
+
+                    <td>
+                        {{ device.operating_system }}
+                    </td>
+
+
+
+                    <td>
+                        {{ device.ip_address }}
+                    </td>
+
+
+
+
+                    <td>
+
+                        {% if device.trusted_until %}
+
+                            {{ device.trusted_until.strftime('%Y-%m-%d %H:%M') }}
+
+                        {% else %}
+
+                            Forever
+
+                        {% endif %}
+
+                    </td>
+
+
+
+
+                    <td>
+
+                        {% if device.last_used %}
+
+                            {{ device.last_used.strftime('%Y-%m-%d %H:%M') }}
+
+                        {% else %}
+
+                            Never
+
+                        {% endif %}
+
+                    </td>
+
+
+
+
+
+                    <td>
+
+
+                        {% if device.is_active %}
+
+                            <span class="active">
+                                Active
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="disabled">
+                                Revoked
+                            </span>
+
+
+                        {% endif %}
+
+
+                    </td>
+
+
+
+
+
+                    <td>
+
+
+                        {% if device.is_active %}
+
+
+                            <form method="POST"
+                                  action="{{ url_for(
+                                  'auth.admin_revoke_trusted_device',
+                                  id=device.id
+                                  ) }}">
+
+
+                                <button type="submit"
+                                        class="admin-btn admin-btn-primary">
+
+                                    Revoke
+
+                                </button>
+
+
+                            </form>
+
+
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+
+
+                    </td>
+
+
+                </tr>
+
+
+                {% endfor %}
+
+
+
+            {% else %}
+
+
+                <tr>
+
+                    <td colspan="9"
+                        style="text-align:center;">
+
+                        No trusted devices found.
+
+                    </td>
+
+                </tr>
+
+
+
+            {% endif %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+```
+
+</div>
+
+</body>
+
+</html>

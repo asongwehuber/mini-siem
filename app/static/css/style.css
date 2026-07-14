@@ -600,3 +600,39 @@ button:hover {
     cursor: pointer;
 
 }
+
+/* LOGIN ACTIONS */
+
+.login-actions {
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-top:20px;
+
+}
+
+
+/* FORGOT PASSWORD LINK */
+
+.forgot-password {
+
+    text-decoration:none;
+
+    font-size:14px;
+
+    color:white;
+
+}
+
+
+.forgot-password:hover {
+
+    text-decoration:underline;
+
+    color:white;
+
+}

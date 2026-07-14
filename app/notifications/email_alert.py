@@ -58,3 +58,33 @@ Timestamp:
 """
 
     mail.send(msg)
+
+
+# =====================================
+# SEND OTP EMAIL
+# =====================================
+
+def send_otp_email(admin, otp_code):
+
+    msg = Message(
+        subject="Mini SIEM - Password Reset OTP",
+        recipients=[admin.email]
+    )
+
+    msg.body = f"""
+Hello {admin.fullname},
+
+A request was made to reset your Mini SIEM administrator password.
+
+Your One-Time Password (OTP) is:
+
+{otp_code}
+
+This OTP is valid for 10 minutes.
+
+If you did not request this password reset, please ignore this email.
+
+Mini SIEM Security Team
+"""
+
+    mail.send(msg)

@@ -4,15 +4,14 @@ from flask_mail import Message
 from app.extensions import db, mail
 from app.database.models import Log, Alert, QuarantinedHost
 from app.response.quarantine import quarantine_host
-from flask_login import login_required
+from flask_login import login_required, current_user
+from app.database.trusted_device import TrustedDevice
 
 from app.detection.detection_engine import (
     detect_brute_force,
     detect_port_scan,
     detect_high_severity_incident
 )
-
-
     
 # =========================================
 # BLUEPRINT
@@ -49,7 +48,16 @@ def home():
 @log_bp.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+
+    trusted_count = TrustedDevice.query.filter_by(
+        admin_id=current_user.id,
+        is_active=True
+    ).count()
+
+    return render_template(
+        'dashboard.html',
+        trusted_count=trusted_count
+    )
 
 
 

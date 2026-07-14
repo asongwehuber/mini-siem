@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Trusted Devices</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="admin-page">
+
+
+<div class="admin-container">
+
+
+<div class="admin-card">
+
+
+<h1>
+Trusted Devices
+</h1>
+
+<a href="{{ url_for('log_bp.dashboard') }}"
+   class="admin-btn admin-btn-primary"
+   style="display:inline-block; margin-bottom:20px;">
+    ← Back to Dashboard
+</a>
+
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+{% if messages %}
+
+{% for category, message in messages %}
+
+<div class="flash {{ category }}">
+
+{{ message }}
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+
+
+
+<table class="admin-table">
+
+
+<tr>
+
+<th>
+Device
+</th>
+
+<th>
+Browser
+</th>
+
+<th>
+Operating System
+</th>
+
+<th>
+IP Address
+</th>
+
+<th>
+Trusted Until
+</th>
+
+<th>
+Last Used
+</th>
+
+<th>
+Status
+</th>
+
+<th>
+Action
+</th>
+
+</tr>
+
+
+
+{% if devices %}
+
+
+
+{% for device in devices %}
+
+
+
+<tr>
+
+
+<td>
+{{ device.device_name }}
+</td>
+
+
+<td>
+{{ device.browser }}
+</td>
+
+
+<td>
+{{ device.operating_system }}
+</td>
+
+
+<td>
+{{ device.ip_address }}
+</td>
+
+
+
+<td>
+
+{% if device.trusted_until %}
+
+{{ device.trusted_until.strftime('%Y-%m-%d %H:%M') }}
+
+{% else %}
+
+Forever
+
+{% endif %}
+
+</td>
+
+
+
+
+<td>
+
+{% if device.last_used %}
+
+{{ device.last_used.strftime('%Y-%m-%d %H:%M') }}
+
+{% else %}
+
+Never
+
+{% endif %}
+
+</td>
+
+
+
+
+<td>
+
+
+{% if device.is_active %}
+
+<span class="active">
+Active
+</span>
+
+
+{% else %}
+
+<span class="disabled">
+Revoked
+</span>
+
+
+{% endif %}
+
+
+
+</td>
+
+
+
+
+<td>
+
+
+{% if device.is_active %}
+
+
+<form method="POST"
+action="{{ url_for('auth.revoke_trusted_device', id=device.id) }}">
+
+
+<button type="submit"
+class="admin-btn admin-btn-primary">
+
+Revoke
+
+</button>
+
+
+</form>
+
+
+{% else %}
+
+-
+
+{% endif %}
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% endfor %}
+
+
+
+
+{% else %}
+
+
+<tr>
+
+<td colspan="8" style="text-align:center;">
+
+No trusted devices found.
+
+</td>
+
+</tr>
+
+
+{% endif %}
+
+
+
+</table>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+</body>
+
+
+</html>

@@ -36,6 +36,12 @@ class Admin(UserMixin, db.Model):
         db.DateTime,
         nullable=True
     )
+    trusted_devices = db.relationship(
+        "TrustedDevice",
+        backref="admin",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -115,3 +121,5 @@ class AttackLocation(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return Admin.query.get(int(user_id))
+
+from app.database.trusted_device import TrustedDevice
