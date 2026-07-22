@@ -108,10 +108,14 @@ async function loadDashboard() {
     try {
 
         const logsResponse = await fetch('/logs');
-        const logs = await logsResponse.json();
+        const logsData = await logsResponse.json();
+
+        const logs = logsData.logs || [];
 
         const alertsResponse = await fetch('/alerts');
-        const alerts = await alertsResponse.json();
+        const alertsData = await alertsResponse.json();
+
+        const alerts = alertsData.alerts || [];
 
         const attackersResponse = await fetch('/top-attackers');
         const attackers = await attackersResponse.json();
@@ -119,8 +123,8 @@ async function loadDashboard() {
         // =========================================
         // COUNTERS
         // =========================================
-        document.getElementById('total-logs').innerText = logs.length;
-        document.getElementById('total-alerts').innerText = alerts.length;
+        document.getElementById('total-logs').innerText = logsData.total || 0;
+        document.getElementById('total-alerts').innerText = alertsData.total || 0;
 
         const criticalAlerts = alerts.filter(alert =>
             alert.severity &&

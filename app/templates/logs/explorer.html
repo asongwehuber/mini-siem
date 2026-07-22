@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Logs Explorer</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+
+    <div class="container">
+
+    <!-- NAVIGATION -->
+    <div class="top-nav">
+
+        <a href="{{ url_for('log_bp.dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <a href="{{ url_for('log_bp.alerts_management') }}">
+            🚨 Alerts
+        </a>
+
+
+         <a href="{{ url_for('log_bp.quarantine_hosts_page') }}">
+            🚫 Quarantine
+        </a>
+
+
+        <a href="{{ url_for('auth.trusted_devices') }}">
+            💻 Trusted Devices ({{ trusted_count }})
+        </a>
+
+        <a href="{{ url_for('auth.logout') }}">
+            🚪 Logout
+        </a>
+
+    </div>
+
+
+
+    <h1>📜 Logs Explorer</h1>
+
+    <div class="card">
+
+    <h2>Search Logs</h2>
+
+
+    <div style="display:flex; gap:15px; flex-wrap:wrap;">
+
+
+    <input
+    id="search-input"
+    type="text"
+    placeholder="Search source IP..."
+    >
+
+
+
+    <select id="severity-filter">
+
+    <option value="">
+    All Severities
+    </option>
+
+    <option value="low">
+    Low
+    </option>
+
+    <option value="medium">
+    Medium
+    </option>
+
+    <option value="high">
+    High
+    </option>
+
+    <option value="critical">
+    Critical
+    </option>
+
+    </select>
+
+
+
+    <select id="event-filter">
+
+    <option value="">
+    All Events
+    </option>
+
+    <option value="failed_login">
+    Failed Login
+    </option>
+
+    <option value="port_scan">
+    Port Scan
+    </option>
+
+    <option value="malware_activity">
+    Malware Activity
+    </option>
+
+    <option value="brute_force">
+    Brute Force
+    </option>
+
+
+    </select>
+
+
+
+    <button onclick="applyFilters()">
+    🔍 Filter
+    </button>
+
+
+    <button onclick="loadLogs()">
+    🔄 Reset
+    </button>
+
+
+    </div>
+
+
+    </div>
+
+
+
+
+
+
+
+    
+   
+
+
+
+    <!-- LOG TABLE -->
+
+    <div class="card">
+
+
+        <h2>Security Logs</h2>
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Timestamp</th>
+
+                    <th>Source IP</th>
+
+                    <th>Hostname</th>
+
+                    <th>Event</th>
+
+                    <th>Severity</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="logs-table">
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+    <div class="card">
+
+        <div id="pagination-info"></div>
+
+        <div id="pagination-buttons"></div>
+
+    </div>
+
+
+</div>
+
+    
+
+<script src="{{ url_for('static', filename='js/logs.js') }}"></script>
+
+</body>
+</html>

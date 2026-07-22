@@ -71,7 +71,7 @@ def login():
 
             login_user(
                 user,
-                remember=False
+                remember=True
             )
 
             session.permanent = True
@@ -120,7 +120,10 @@ def login():
                 otp.otp_code
             )
         except Exception as e:
-            print(f"[EMAIL ERROR] {e}")
+            flash(
+                "unable to send verification email.",
+                "danger"
+                )
 
     
 
@@ -181,7 +184,7 @@ def verify_login_otp():
 
             login_user(
                 admin,
-                remember=False
+                remember=True
             )
 
             session.permanent = True
@@ -213,20 +216,7 @@ def verify_login_otp():
             return redirect(
                 url_for("log_bp.dashboard")
             )
-
-            session.pop("login_admin_id", None)
-            session.pop("trust_device", None)
-            session.pop("login_otp_last_sent", None)
-
-            flash(
-                "Login successful.",
-                "success"
-            )
-
-            return redirect(
-                url_for("log_bp.dashboard")
-            )
-
+        
         flash(
             "Invalid or expired verification code.",
             "danger"
@@ -311,7 +301,7 @@ def resend_login_otp():
         print(e)
 
         flash(
-            "Unable to send verification code.",
+            "Unable to send verification email.",
             "danger"
         )
 
@@ -320,7 +310,7 @@ def resend_login_otp():
         )
 
     flash(
-        "A new verification code has been sent.",
+        "A new verification code has been sent to your mail.",
         "success"
     )
 
@@ -529,6 +519,7 @@ def resend_otp():
             "Unable to send OTP email.",
             "danger"
         )
+    
 
         return redirect(
             url_for("auth.verify_otp")
@@ -590,7 +581,7 @@ def trust_device():
 
         login_user(
             admin,
-            remember=False
+            remember=True
         )
 
         session.pop("trust_device", None)
@@ -638,7 +629,7 @@ def trust_device():
 
         login_user(
             admin,
-            remember=False
+            remember=True
         )
 
 

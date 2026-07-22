@@ -7,6 +7,7 @@ from app.response.quarantine import quarantine_host
 from flask_login import login_required, current_user
 from app.database.trusted_device import TrustedDevice
 
+
 from app.detection.detection_engine import (
     detect_brute_force,
     detect_port_scan,
@@ -34,13 +35,20 @@ def format_time(dt):
     ).strftime("%d-%m-%y %H:%M:%S")
 
 
+
+
 # =========================================
-# login HOME
+# HOME
 # =========================================
 @log_bp.route('/')
 def home():
-    return redirect(url_for('auth.login'))
 
+    # Already logged in
+    if current_user.is_authenticated:
+        return redirect(url_for('log_bp.dashboard'))
+
+    # Not logged in
+    return redirect(url_for('auth.login'))
 
 # =========================================
 # dashboard
@@ -150,9 +158,8 @@ def submit_log():
             "error": str(e)
         }), 500
 
-
 # =========================================
-# GET ALL LOGS
+# GET ALL LOGS (PAGINATED)
 # =========================================
 @log_bp.route('/logs', methods=['GET'])
 @login_required
@@ -160,27 +167,54 @@ def get_logs():
 
     try:
 
-        logs = Log.query.order_by(
+        page = request.args.get(
+            "page",
+            1,
+            type=int
+        )
+
+        per_page = 50
+
+
+        pagination = Log.query.order_by(
             Log.timestamp.desc()
-        ).all()
+        ).paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
 
-        return jsonify([
 
-            {
-                "id": log.id,
-                "timestamp": format_time(log.timestamp),
-                "source_ip": log.source_ip,
-                "hostname": log.hostname,
-                "event_type": log.event_type,
-                "severity": log.severity,
-                "destination_port": log.destination_port,
-                "message": log.message
-                
-            }
+        logs = pagination.items
 
-            for log in logs
 
-        ]), 200
+        return jsonify({
+
+            "logs": [
+
+                {
+                    "id": log.id,
+                    "timestamp": format_time(log.timestamp),
+                    "source_ip": log.source_ip,
+                    "hostname": log.hostname,
+                    "event_type": log.event_type,
+                    "severity": log.severity,
+                    "destination_port": log.destination_port,
+                    "message": log.message
+                }
+
+                for log in logs
+
+            ],
+
+            "page": pagination.page,
+
+            "pages": pagination.pages,
+
+            "total": pagination.total
+
+        }), 200
+
 
     except Exception as e:
 
@@ -234,33 +268,116 @@ def get_alerts():
 
     try:
 
-        alerts = Alert.query.order_by(
+        page = request.args.get(
+            "page",
+            1,
+            type=int
+        )
+
+        per_page = 50
+
+
+        pagination = Alert.query.order_by(
             Alert.timestamp.desc()
-        ).all()
+        ).paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
 
-        return jsonify([
 
-            {
-                "id": alert.id,
-                "alert_name": alert.alert_name,
-                "description": alert.description,
-                "severity": alert.severity,
-                "source_ip": alert.source_ip,
-                "event_count": alert.event_count,
-                "status": alert.status,
-                "timestamp": format_time(alert.timestamp)
-            }
+        alerts = pagination.items
 
-            for alert in alerts
 
-        ]), 200
+        return jsonify({
+
+            "alerts": [
+
+                {
+                    "id": alert.id,
+                    "alert_name": alert.alert_name,
+                    "description": alert.description,
+                    "severity": alert.severity,
+                    "source_ip": alert.source_ip,
+                    "event_count": alert.event_count,
+                    "status": alert.status,
+                    "timestamp": format_time(alert.timestamp)
+                }
+
+                for alert in alerts
+
+            ],
+
+            "page": pagination.page,
+
+            "pages": pagination.pages,
+
+            "total": pagination.total
+
+        }), 200
+
 
     except Exception as e:
+
 
         return jsonify({
             "error": str(e)
         }), 500
 
+
+
+# =========================================
+# GET SINGLE ALERT
+# =========================================
+
+@log_bp.route('/alert/<int:alert_id>', methods=['GET'])
+@login_required
+def get_single_alert(alert_id):
+
+    try:
+
+        alert = Alert.query.get(alert_id)
+
+        if not alert:
+
+            return jsonify({
+
+                "error": "Alert not found"
+
+            }), 404
+
+
+        return jsonify({
+
+            "id": alert.id,
+
+            "alert_name": alert.alert_name,
+
+            "description": alert.description,
+
+            "severity": alert.severity,
+
+            "source_ip": alert.source_ip,
+
+            "event_count": alert.event_count,
+
+            "status": alert.status,
+
+            "timestamp": format_time(
+                alert.timestamp
+            )
+
+        }), 200
+
+
+    except Exception as e:
+
+        return jsonify({
+
+            "error": str(e)
+
+        }), 500
+    
 
 # =========================================
 # RESOLVE ALERT
@@ -312,48 +429,194 @@ def search_logs():
         event_type = request.args.get('event_type')
         severity = request.args.get('severity')
 
+        page = request.args.get(
+            "page",
+            1,
+            type=int
+        )
+
+        per_page = 50
+
+
         query = Log.query
+
 
         if source_ip:
             query = query.filter_by(
                 source_ip=source_ip
             )
 
+
         if event_type:
             query = query.filter_by(
                 event_type=event_type
             )
+
 
         if severity:
             query = query.filter_by(
                 severity=severity
             )
 
-        logs = query.order_by(
+
+        pagination = query.order_by(
             Log.timestamp.desc()
-        ).all()
+        ).paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
 
-        return jsonify([
 
-            {
-                "id": log.id,
-                "timestamp": format_time(log.timestamp),
-                "source_ip": log.source_ip,
-                "hostname": log.hostname,
-                "event_type": log.event_type,
-                "severity": log.severity,
-                "destination_port": log.destination_port,
-                "message": log.message
-            }
+        logs = pagination.items
 
-            for log in logs
 
-        ]), 200
+        return jsonify({
+
+            "logs": [
+
+                {
+                    "id": log.id,
+                    "timestamp": format_time(log.timestamp),
+                    "source_ip": log.source_ip,
+                    "hostname": log.hostname,
+                    "event_type": log.event_type,
+                    "severity": log.severity,
+                    "destination_port": log.destination_port,
+                    "message": log.message
+                }
+
+                for log in logs
+
+            ],
+
+            "page": pagination.page,
+
+            "pages": pagination.pages,
+
+            "total": pagination.total
+
+        }), 200
+
 
     except Exception as e:
 
         return jsonify({
             "error": str(e)
+        }), 500
+
+
+# =========================================
+# SEARCH ALERTS
+# =========================================
+
+@log_bp.route('/alerts/search', methods=['GET'])
+@login_required
+def search_alerts():
+
+    try:
+
+        source_ip = request.args.get("source_ip")
+
+        severity = request.args.get("severity")
+
+        status = request.args.get("status")
+
+        page = request.args.get(
+            "page",
+            1,
+            type=int
+        )
+
+        per_page = 50
+
+        query = Alert.query
+
+
+        if source_ip:
+
+            query = query.filter_by(
+                source_ip=source_ip
+            )
+
+
+        if severity:
+
+            query = query.filter_by(
+                severity=severity
+            )
+
+
+        if status:
+
+            query = query.filter_by(
+                status=status
+            )
+
+
+        pagination = query.order_by(
+
+            Alert.timestamp.desc()
+
+        ).paginate(
+
+            page=page,
+
+            per_page=per_page,
+
+            error_out=False
+
+        )
+
+
+        alerts = pagination.items
+
+
+        return jsonify({
+
+            "alerts":[
+
+                {
+
+                    "id": alert.id,
+
+                    "alert_name": alert.alert_name,
+
+                    "description": alert.description,
+
+                    "severity": alert.severity,
+
+                    "source_ip": alert.source_ip,
+
+                    "event_count": alert.event_count,
+
+                    "status": alert.status,
+
+                    "timestamp": format_time(
+                        alert.timestamp
+                    )
+
+                }
+
+                for alert in alerts
+
+            ],
+
+            "page": pagination.page,
+
+            "pages": pagination.pages,
+
+            "total": pagination.total
+
+        })
+
+
+    except Exception as e:
+
+        return jsonify({
+
+            "error": str(e)
+
         }), 500
 
 
@@ -423,35 +686,71 @@ def test_email():
         }), 500
     
 
+# =========================================
+# GET QUARANTINED HOSTS (PAGINATED)
+# =========================================
 @log_bp.route('/quarantined-hosts', methods=['GET'])
 @login_required
 def get_quarantined_hosts():
 
-    hosts = QuarantinedHost.query.filter_by(
-        status='quarantined'
-    ).order_by(
-        QuarantinedHost.quarantined_at.desc()
-    ).all()
+    try:
 
-    total_hosts = len(hosts)
+        page = request.args.get(
+            "page",
+            1,
+            type=int
+        )
 
-    return jsonify({
-        "total_quarantined": total_hosts,
-        "hosts": [
-            {
-                "id": host.id,
-                "source_ip": host.source_ip,
-                "hostname": host.hostname,
-                "reason": host.reason,
-                "status": host.status,
-                "quarantined_at": format_time(
-                    host.quarantined_at
-                )
-            }
-            for host in hosts
-        ]
-    })
+        per_page = 50
 
+
+        pagination = QuarantinedHost.query.filter_by(
+            status='quarantined'
+        ).order_by(
+            QuarantinedHost.quarantined_at.desc()
+        ).paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
+
+
+        hosts = pagination.items
+
+
+        return jsonify({
+
+            "hosts": [
+
+                {
+                    "id": host.id,
+                    "source_ip": host.source_ip,
+                    "hostname": host.hostname,
+                    "reason": host.reason,
+                    "status": host.status,
+                    "quarantined_at": format_time(
+                        host.quarantined_at
+                    )
+                }
+
+                for host in hosts
+
+            ],
+
+            "page": pagination.page,
+
+            "pages": pagination.pages,
+
+            "total": pagination.total
+
+        }), 200
+
+
+    except Exception as e:
+
+        return jsonify({
+            "error": str(e)
+        }), 500
 
 @log_bp.route('/test-quarantine')
 @login_required
@@ -533,3 +832,58 @@ def get_quarantined_hosts_summary():
             for host in hosts
         ]
     })
+# =========================================
+# LOGS EXPLORER PAGE
+# =========================================
+@log_bp.route('/logs/explorer')
+@login_required
+def logs_explorer():
+
+    return render_template(
+        'logs/explorer.html',
+        trusted_count=TrustedDevice.query.filter_by(
+            admin_id=current_user.id,
+            is_active=True
+        ).count()
+    )
+
+
+# =========================================
+# ALERTS MANAGEMENT PAGE
+# =========================================
+
+@log_bp.route('/alerts/management')
+@login_required
+def alerts_management():
+
+    trusted_count = TrustedDevice.query.filter_by(
+        admin_id=current_user.id,
+        is_active=True
+    ).count()
+
+
+    return render_template(
+        'alerts/management.html',
+        trusted_count=trusted_count
+    )
+
+
+
+# =========================================
+# QUARANTINE HOSTS PAGE
+# =========================================
+
+@log_bp.route('/quarantine/hosts')
+@login_required
+def quarantine_hosts_page():
+
+    trusted_count = TrustedDevice.query.filter_by(
+        admin_id=current_user.id,
+        is_active=True
+    ).count()
+
+
+    return render_template(
+        'quarantine/hosts.html',
+        trusted_count=trusted_count
+    )

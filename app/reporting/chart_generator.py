@@ -7,9 +7,15 @@ SEVERITY_COLORS = {
     "Low": "#33cc33"
 }
 
+
 def generate_severity_chart(data, output_file):
 
-    labels = ["Critical", "High", "Medium", "Low"]
+    labels = [
+        "Critical",
+        "High",
+        "Medium",
+        "Low"
+    ]
 
     values = [
         data.get("critical_alerts", 0),
@@ -17,23 +23,41 @@ def generate_severity_chart(data, output_file):
         data.get("medium_alerts", 0),
         data.get("low_alerts", 0)
     ]
+
+
+    # Handle days with no alerts
+    if sum(values) == 0:
+
+        labels = ["No Alerts"]
+        values = [1]
+
+
     colors = [
-        SEVERITY_COLORS["Critical"],
-        SEVERITY_COLORS["High"],
-        SEVERITY_COLORS["Medium"],
-        SEVERITY_COLORS["Low"]
+        SEVERITY_COLORS.get(label, "#999999")
+        for label in labels
     ]
 
+
     plt.figure(figsize=(6, 4))
+
 
     plt.pie(
         values,
         labels=labels,
+        colors=colors,
         autopct="%1.1f%%"
     )
 
-    plt.title("Alert Severity Distribution")
 
-    plt.savefig(output_file)
+    plt.title(
+        "Alert Severity Distribution"
+    )
+
+
+    plt.savefig(
+        output_file,
+        bbox_inches="tight"
+    )
+
 
     plt.close()

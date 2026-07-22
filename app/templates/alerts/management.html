@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Alerts Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- NAVIGATION -->
+    <div class="top-nav">
+
+
+        <a href="{{ url_for('log_bp.dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+
+        <a href="{{ url_for('log_bp.logs_explorer') }}">
+            📜 Logs
+        </a>
+
+        <a href="{{ url_for('log_bp.quarantine_hosts_page') }}">
+            🚫 Quarantine
+        </a>
+
+
+        <a href="{{ url_for('auth.trusted_devices') }}">
+            💻 Trusted Devices ({{ trusted_count }})
+        </a>
+
+
+        <a href="{{ url_for('auth.logout') }}">
+            🚪 Logout
+        </a>
+
+
+    </div>
+
+
+
+
+    <h1>🚨 Alerts Management</h1>
+
+
+
+
+    <!-- FILTER CARD -->
+
+    <div class="card">
+
+
+        <h2>Search Alerts</h2>
+
+
+
+        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+
+
+
+            <input
+                id="search-input"
+                type="text"
+                placeholder="Search source IP..."
+            >
+
+
+
+
+            <select id="severity-filter">
+
+
+                <option value="">
+                    All Severities
+                </option>
+
+
+                <option value="low">
+                    Low
+                </option>
+
+
+                <option value="medium">
+                    Medium
+                </option>
+
+
+                <option value="high">
+                    High
+                </option>
+
+
+                <option value="critical">
+                    Critical
+                </option>
+
+
+            </select>
+
+
+
+
+
+            <select id="status-filter">
+
+
+                <option value="">
+                    All Status
+                </option>
+
+
+                <option value="OPEN">
+                    Open
+                </option>
+
+
+                <option value="RESOLVED">
+                    Resolved
+                </option>
+
+
+            </select>
+
+
+
+
+
+            <button onclick="applyAlertFilters()">
+
+                🔍 Filter
+
+            </button>
+
+
+
+
+
+            <button onclick="loadAlerts()">
+
+                🔄 Reset
+
+            </button>
+
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- ALERT TABLE -->
+
+
+    <div class="card">
+
+
+        <h2>Security Alerts</h2>
+
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Timestamp</th>
+
+                    <th>Alert</th>
+
+                    <th>Severity</th>
+
+                    <th>Source IP</th>
+
+                    <th>Events</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+
+            </thead>
+
+
+
+
+            <tbody id="alerts-table">
+
+
+            </tbody>
+
+
+
+        </table>
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- INFORMATION -->
+
+    <div class="card">
+
+
+        <div id="alerts-info"></div>
+
+
+        <br>
+
+
+        <div id="alerts-pagination-buttons"></div>
+
+
+    </div>
+
+</div>
+
+
+
+<script src="{{ url_for('static', filename='js/alerts.js') }}"></script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Quarantined Hosts</title>
+
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- Navigation -->
+
+    <div class="top-nav">
+
+
+        <a href="{{ url_for('log_bp.dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+
+        <a href="{{ url_for('log_bp.logs_explorer') }}">
+            📜 Logs
+        </a>
+
+
+        <a href="{{ url_for('log_bp.alerts_management') }}">
+            🚨 Alerts
+        </a>
+
+
+        <a href="{{ url_for('auth.trusted_devices') }}">
+            💻 Trusted Devices ({{ trusted_count }})
+        </a>
+
+
+        <a href="{{ url_for('auth.logout') }}">
+            🚪 Logout
+        </a>
+
+
+    </div>
+
+
+
+
+    <h1>🚫 Quarantined Hosts</h1>
+
+
+
+
+    <!-- SUMMARY CARD -->
+
+    <div class="card">
+
+
+        <h2>Quarantine Summary</h2>
+
+
+        <p>
+
+            Total Quarantined Hosts:
+
+            <strong id="quarantine-count">
+                0
+            </strong>
+
+        </p>
+
+
+
+        <button onclick="loadQuarantinedHosts()">
+
+            🔄 Refresh
+
+        </button>
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- SEARCH / FILTER CARD -->
+
+    <div class="card">
+
+
+        <h2>Search Quarantined Hosts</h2>
+
+
+
+        <div style="display:flex;gap:15px;flex-wrap:wrap;">
+
+
+
+            <input
+
+                id="search-input"
+
+                type="text"
+
+                placeholder="Search Source IP or Hostname"
+
+            >
+
+
+
+            <select id="status-filter">
+
+
+                <option value="">
+                    All Status
+                </option>
+
+
+                <option value="quarantined">
+                    Quarantined
+                </option>
+
+
+                <option value="released">
+                    Released
+                </option>
+
+
+            </select>
+
+
+
+            <button onclick="applyQuarantineFilters()">
+
+                🔍 Filter
+
+            </button>
+
+
+
+            <button onclick="loadQuarantinedHosts(1)">
+
+                Reset
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- QUARANTINED HOSTS TABLE -->
+
+
+    <div class="card">
+
+
+        <h2>Quarantined Hosts</h2>
+
+
+
+        <table>
+
+
+            <thead>
+
+
+            <tr>
+
+
+                <th>ID</th>
+
+
+                <th>Hostname</th>
+
+
+                <th>Source IP</th>
+
+
+                <th>Reason</th>
+
+
+                <th>Status</th>
+
+
+                <th>Quarantined At</th>
+
+
+                <th>Action</th>
+
+
+            </tr>
+
+
+            </thead>
+
+
+
+
+            <tbody id="quarantine-table">
+
+
+            </tbody>
+
+
+
+        </table>
+
+
+    </div>
+
+
+
+
+
+
+
+    <!-- PAGINATION -->
+
+
+    <div class="card">
+
+
+        <div id="quarantine-info"></div>
+
+
+        <br>
+
+
+        <div id="quarantine-pagination-buttons"></div>
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+<script src="{{ url_for('static',
+filename='js/quarantine.js') }}"></script>
+
+
+
+</body>
+
+
+</html>

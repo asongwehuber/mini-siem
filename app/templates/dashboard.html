@@ -50,17 +50,42 @@
 
         <div style="display:flex; gap:20px; align-items:center;">
 
+
+            <a href="{{ url_for('log_bp.logs_explorer') }}"
+            style="color:white; text-decoration:none; font-weight:bold;">
+                📜 Logs
+            </a>
+
+
+            <a href="{{ url_for('log_bp.alerts_management') }}"
+            style="color:white; text-decoration:none; font-weight:bold;">
+                🚨 Alerts
+            </a>
+
+
+            <a href="{{ url_for('log_bp.quarantine_hosts_page') }}"
+            style="color:white; text-decoration:none; font-weight:bold;">
+                🚫 Quarantine
+            </a>
+
+
             <a href="{{ url_for('auth.trusted_devices') }}"
             style="color:white; text-decoration:none; font-weight:bold;">
                 💻 Trusted Devices ({{ trusted_count }})
             </a>
+
 
             <a href="{{ url_for('auth.logout') }}"
             style="color:white; text-decoration:none; font-weight:bold;">
                 🚪 Logout
             </a>
 
+
         </div>
+
+        
+
+
 
     </div>
 

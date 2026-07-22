@@ -4,13 +4,18 @@ from zoneinfo import ZoneInfo
 
 
 ALERT_RECIPIENTS = [
-    "huber.asongwe@gmail.com",
-    # "reinette.mengue@campost.cm", do not remove this
-    # "reinettemengue@gmail.com" do not remove this
+    #"huber.asongwe@gmail.com",
+    #"reinette.mengue@campost.cm",
+    #"reinettemengue@gmail.com"
 ]
 
 
 def send_alert_email(alert):
+
+    # Disable email if no recipients configured
+    if not ALERT_RECIPIENTS:
+        print("Email alert skipped: no recipients configured")
+        return
 
     # -----------------------------
     # TIMEZONE CONVERSION
@@ -21,9 +26,6 @@ def send_alert_email(alert):
         ZoneInfo("Africa/Douala")
     )
 
-    # -----------------------------
-    # GEOIP ENRICHMENT DISPLAY
-    # -----------------------------
     geo = getattr(alert, "geo", None)
 
     location_text = "Unknown"
@@ -33,9 +35,7 @@ def send_alert_email(alert):
         country = geo.get("country", "Unknown")
         location_text = f"{city}, {country}"
 
-    # -----------------------------
-    # EMAIL MESSAGE
-    # -----------------------------
+
     msg = Message(
         subject=f"🚨 Mini-SIEM Alert: {alert.alert_name}",
         recipients=ALERT_RECIPIENTS
@@ -58,6 +58,7 @@ Timestamp:
 """
 
     mail.send(msg)
+
 
 
 # =====================================

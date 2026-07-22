@@ -25,7 +25,7 @@ def create_app():
     app.config["SESSION_COOKIE_SECURE"] = False
 
     # Flask session lifetime
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=20)
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=20)
 
     # Refresh active sessions
     app.config["SESSION_REFRESH_EACH_REQUEST"] = True
@@ -111,6 +111,12 @@ def create_app():
     login_manager.login_view = "auth.login"
 
     login_manager.session_protection = "strong"
+
+    login_manager.remember_cookie_duration = timedelta(days=30)
+
+    app.config["REMEMBER_COOKIE_HTTPONLY"] = True
+    app.config["REMEMBER_COOKIE_SECURE"] = False
+    app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
 
 
 
