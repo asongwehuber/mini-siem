@@ -100,6 +100,8 @@ function displayLogs(logs){
 }
 
 
+
+
 function applyFilters(page = 1){
 
 
@@ -120,6 +122,27 @@ function applyFilters(page = 1){
     let event_type =
         document.getElementById(
             "event-filter"
+        ).value;
+
+
+
+    let period =
+        document.getElementById(
+            "time-filter"
+        ).value;
+
+
+
+    let start_time =
+        document.getElementById(
+            "start-time"
+        ).value;
+
+
+
+    let end_time =
+        document.getElementById(
+            "end-time"
         ).value;
 
 
@@ -168,6 +191,52 @@ function applyFilters(page = 1){
 
 
 
+    /*
+    TIME FILTER
+    */
+
+
+    if(period && period !== "custom"){
+
+        params.append(
+            "period",
+            period
+        );
+
+    }
+
+
+
+    if(period === "custom"){
+
+
+        if(start_time && end_time){
+
+
+            params.append(
+                "start_time",
+                start_time
+            );
+
+
+            params.append(
+                "end_time",
+                end_time
+            );
+
+
+        }
+
+
+    }
+
+    window.history.pushState(
+        {},
+        "",
+        "?" + params.toString()
+    );
+
+
     fetch(
         "/search?" + params.toString()
     )
@@ -211,6 +280,7 @@ function applyFilters(page = 1){
 
 
 
+
 function viewLog(id){
 
     fetch("/log/" + id)
@@ -243,6 +313,7 @@ function viewLog(id){
 
     })
 
+
     .catch(error => {
 
         console.error(
@@ -253,6 +324,8 @@ function viewLog(id){
     });
 
 }
+
+
 
 
 
@@ -297,7 +370,7 @@ function updatePagination(page, pages, total){
 
         buttons.innerHTML +=
         `
-        <button onclick="loadLogs(${page-1})">
+        <button onclick="changeLogPage(${page-1})">
             ◀ Previous
         </button>
         `;
@@ -310,11 +383,101 @@ function updatePagination(page, pages, total){
 
         buttons.innerHTML +=
         `
-        <button onclick="loadLogs(${page+1})">
+        <button onclick="changeLogPage(${page+1})">
             Next ▶
         </button>
         `;
 
     }
+
+}
+
+
+
+
+
+
+function toggleCustomTime(){
+
+    let selected =
+        document.getElementById(
+            "time-filter"
+        ).value;
+
+
+
+    let customBox =
+        document.getElementById(
+            "custom-time-range"
+        );
+
+
+
+    if(selected === "custom"){
+
+        customBox.style.display = "flex";
+
+    }
+
+    else{
+
+
+        customBox.style.display = "none";
+
+
+        document.getElementById(
+            "start-time"
+        ).value = "";
+
+
+        document.getElementById(
+            "end-time"
+        ).value = "";
+
+
+    }
+
+}
+
+function changeLogPage(page){
+
+    let params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    params.set(
+        "page",
+        page
+    );
+
+
+    fetch(
+        "/search?" +
+        params.toString()
+    )
+
+
+    .then(response => response.json())
+
+
+    .then(data => {
+
+
+        displayLogs(
+            data.logs
+        );
+
+
+        updatePagination(
+            data.page,
+            data.pages,
+            data.total
+        );
+
+
+    });
+
 
 }

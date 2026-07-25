@@ -1,50 +1,5 @@
 document.addEventListener(
     "DOMContentLoaded",
-    function loadAlerts(page = 1){
-
-
-        fetch("/alerts?page=" + page)
-
-
-        .then(response => response.json())
-
-
-        .then(data => {
-
-
-            displayAlerts(data.alerts);
-
-
-            updateAlertPagination(
-                data.page,
-                data.pages,
-                data.total
-            );
-
-
-        })
-
-
-        .catch(error => {
-
-
-            console.error(
-                "Error loading alerts:",
-                error
-            );
-
-
-        });
-
-    }
-
-);
-
-let allAlerts = [];
-
-
-document.addEventListener(
-    "DOMContentLoaded",
     function(){
 
         loadAlerts(1);
@@ -54,10 +9,17 @@ document.addEventListener(
 
 
 
+let allAlerts = [];
+
+
+
+
 function loadAlerts(page = 1){
 
 
-    fetch("/alerts?page=" + page)
+    fetch(
+        "/alerts?page=" + page
+    )
 
 
     .then(response => response.json())
@@ -95,7 +57,9 @@ function loadAlerts(page = 1){
 
     });
 
+
 }
+
 
 
 
@@ -147,7 +111,7 @@ function displayAlerts(alerts){
                 <br>
 
                 <small>
-                ${alert.description}
+                ${alert.description || ""}
                 </small>
 
             </td>
@@ -245,7 +209,8 @@ function displayAlerts(alerts){
 
 
 
-function applyAlertFilters(){
+
+function applyAlertFilters(page = 1){
 
 
     let search =
@@ -253,7 +218,7 @@ function applyAlertFilters(){
             "search-input"
         )
         .value
-        .toLowerCase();
+        .trim();
 
 
 
@@ -273,49 +238,168 @@ function applyAlertFilters(){
 
 
 
-
-    let filtered =
-        allAlerts.filter(alert => {
-
-
-
-            let ip =
-                (alert.source_ip || "")
-                .toLowerCase();
+    let period =
+        document.getElementById(
+            "time-filter"
+        )
+        .value;
 
 
 
-            return (
+    let start_time =
+        document.getElementById(
+            "start-time"
+        )
+        .value;
 
 
-                (!search ||
-                ip.includes(search))
+
+    let end_time =
+        document.getElementById(
+            "end-time"
+        )
+        .value;
 
 
-                &&
 
 
-                (!severity ||
-                alert.severity === severity)
+
+    let params = new URLSearchParams();
 
 
-                &&
+
+    params.append(
+        "page",
+        page
+    );
 
 
-                (!status ||
-                alert.status === status)
 
 
+
+    if(search){
+
+        params.append(
+            "source_ip",
+            search
+        );
+
+    }
+
+
+
+
+
+    if(severity){
+
+        params.append(
+            "severity",
+            severity
+        );
+
+    }
+
+
+
+
+
+    if(status){
+
+        params.append(
+            "status",
+            status
+        );
+
+    }
+
+
+
+
+
+    /*
+        TIME FILTER
+    */
+
+
+    if(period && period !== "custom"){
+
+
+        params.append(
+            "period",
+            period
+        );
+
+
+    }
+
+
+
+
+
+    if(period === "custom"){
+
+
+        if(start_time && end_time){
+
+
+            params.append(
+                "start_time",
+                start_time
             );
 
 
+            params.append(
+                "end_time",
+                end_time
+            );
 
-        });
+
+        }
+
+
+    }
 
 
 
 
-    displayAlerts(filtered);
+
+
+    fetch(
+        "/alerts/search?" + params.toString()
+    )
+
+
+    .then(response => response.json())
+
+
+    .then(data => {
+
+
+        displayAlerts(
+            data.alerts
+        );
+
+
+        updateAlertPagination(
+            data.page,
+            data.pages,
+            data.total
+        );
+
+
+    })
+
+
+    .catch(error => {
+
+
+        console.error(
+            "Alert filter error:",
+            error
+        );
+
+
+    });
 
 
 
@@ -373,6 +457,13 @@ function resolveAlert(id){
 
 }
 
+
+
+
+
+
+
+
 function updateAlertPagination(
     page,
     pages,
@@ -384,6 +475,7 @@ function updateAlertPagination(
         document.getElementById(
             "alerts-info"
         );
+
 
 
     if(info){
@@ -401,10 +493,13 @@ function updateAlertPagination(
 
 
 
+
+
     let buttons =
         document.getElementById(
             "alerts-pagination-buttons"
         );
+
 
 
     if(!buttons)
@@ -412,7 +507,11 @@ function updateAlertPagination(
 
 
 
+
+
     buttons.innerHTML = "";
+
+
 
 
 
@@ -420,6 +519,7 @@ function updateAlertPagination(
 
 
         buttons.innerHTML +=
+
 
         `
 
@@ -433,6 +533,8 @@ function updateAlertPagination(
 
 
     }
+
+
 
 
 
@@ -454,6 +556,67 @@ function updateAlertPagination(
 
 
     }
+
+
+}
+
+
+
+
+
+
+
+
+function toggleCustomTime(){
+
+
+    let selected =
+        document.getElementById(
+            "time-filter"
+        )
+        .value;
+
+
+
+
+    let customBox =
+        document.getElementById(
+            "custom-time-range"
+        );
+
+
+
+
+
+    if(selected === "custom"){
+
+
+        customBox.style.display = "flex";
+
+
+    }
+
+
+    else{
+
+
+        customBox.style.display = "none";
+
+
+
+        document.getElementById(
+            "start-time"
+        ).value = "";
+
+
+
+        document.getElementById(
+            "end-time"
+        ).value = "";
+
+
+    }
+
 
 
 }

@@ -186,11 +186,6 @@ function displayQuarantinedHosts(hosts){
 
 
 
-
-
-
-
-
 function applyQuarantineFilters(){
 
 
@@ -211,65 +206,130 @@ function applyQuarantineFilters(){
 
 
 
-
-    let filtered =
-        allQuarantinedHosts.filter(host => {
-
-
-
-            let ip =
-                (
-                    host.source_ip || ""
-                )
-                .toLowerCase();
+    let period =
+        document.getElementById(
+            "time-filter"
+        )
+        .value;
 
 
 
-            let hostname =
-                (
-                    host.hostname || ""
-                )
-                .toLowerCase();
+    let start_time =
+        document.getElementById(
+            "start-time"
+        )
+        .value;
 
 
 
-
-            return (
-
-                (!search ||
-
-                ip.includes(search) ||
-
-                hostname.includes(search))
-
-
-                &&
-
-
-                (!status ||
-
-                host.status === status)
-
-
-            );
+    let end_time =
+        document.getElementById(
+            "end-time"
+        )
+        .value;
 
 
 
-        });
+    let params = new URLSearchParams();
 
 
 
+    if(period){
 
-    displayQuarantinedHosts(filtered);
+        params.append(
+            "period",
+            period
+        );
 
+    }
+
+
+
+    if(period === "custom"){
+
+
+        params.append(
+            "start_time",
+            start_time
+        );
+
+
+        params.append(
+            "end_time",
+            end_time
+        );
+
+    }
+
+
+
+    if(search){
+
+        params.append(
+            "search",
+            search
+        );
+
+    }
+
+
+
+    if(status){
+
+        params.append(
+            "status",
+            status
+        );
+
+    }
+
+
+
+    fetch(
+        "/quarantined-hosts?" +
+        params.toString()
+    )
+
+
+    .then(response => response.json())
+
+
+    .then(data => {
+
+
+        allQuarantinedHosts =
+            data.hosts;
+
+
+
+        displayQuarantinedHosts(
+            data.hosts
+        );
+
+
+        updateQuarantinePagination(
+            data.page,
+            data.pages,
+            data.total
+        );
+
+
+    })
+
+
+    .catch(error => {
+
+
+        console.error(
+            "Filter error:",
+            error
+        );
+
+
+    });
 
 
 }
-
-
-
-
-
 
 
 
@@ -402,10 +462,6 @@ function updateQuarantinePagination(
 
 
 
-
-
-
-
     if(page < pages){
 
 
@@ -425,6 +481,54 @@ function updateQuarantinePagination(
 
     }
 
+
+
+}
+
+
+function toggleCustomTime(){
+
+
+    let selected =
+        document.getElementById(
+            "time-filter"
+        ).value;
+
+
+
+    let customBox =
+        document.getElementById(
+            "custom-time-range"
+        );
+
+
+
+    if(selected === "custom"){
+
+
+        customBox.style.display =
+            "flex";
+
+
+    }
+    else{
+
+
+        customBox.style.display =
+            "none";
+
+
+        document.getElementById(
+            "start-time"
+        ).value = "";
+
+
+        document.getElementById(
+            "end-time"
+        ).value = "";
+
+
+    }
 
 
 }

@@ -6,6 +6,8 @@ from app.database.models import Log, Alert, QuarantinedHost
 from app.response.quarantine import quarantine_host
 from flask_login import login_required, current_user
 from app.database.trusted_device import TrustedDevice
+from app.utils.time_filters import get_time_range
+from datetime import datetime
 
 
 from app.detection.detection_engine import (
@@ -428,6 +430,12 @@ def search_logs():
         source_ip = request.args.get('source_ip')
         event_type = request.args.get('event_type')
         severity = request.args.get('severity')
+        period = request.args.get('period')
+
+        start_time = request.args.get('start_time')
+
+        end_time = request.args.get('end_time')
+
 
         page = request.args.get(
             "page",
@@ -437,8 +445,40 @@ def search_logs():
 
         per_page = 50
 
-
         query = Log.query
+
+        # Quick time filters
+
+
+        # predefined periods
+        if period and period != "custom":
+
+            start, end = get_time_range(period)
+
+            if start and end:
+
+                query = query.filter(
+                    Log.timestamp >= start,
+                    Log.timestamp <= end
+                )
+
+
+        # custom date range
+        if period == "custom" and start_time and end_time:
+
+            start = datetime.fromisoformat(
+                start_time
+            )
+
+            end = datetime.fromisoformat(
+                end_time
+            )
+
+
+            query = query.filter(
+                Log.timestamp >= start,
+                Log.timestamp <= end
+            )
 
 
         if source_ip:
@@ -494,6 +534,8 @@ def search_logs():
 
             "pages": pagination.pages,
 
+            ""
+            ""
             "total": pagination.total
 
         }), 200
@@ -522,6 +564,12 @@ def search_alerts():
 
         status = request.args.get("status")
 
+        period = request.args.get("period")
+
+        start_time = request.args.get("start_time")
+
+        end_time = request.args.get("end_time")
+
         page = request.args.get(
             "page",
             1,
@@ -531,6 +579,35 @@ def search_alerts():
         per_page = 50
 
         query = Alert.query
+
+        if period:
+
+            start, end = get_time_range(period)
+
+            if start:
+
+                query = query.filter(
+                    Alert.timestamp >= start,
+                    Alert.timestamp <= end
+                )
+
+
+        if start_time and end_time:
+
+            start = datetime.fromisoformat(
+                start_time
+            )
+
+            end = datetime.fromisoformat(
+                end_time
+            )
+
+
+            query = query.filter(
+                Alert.timestamp >= start,
+                Alert.timestamp <= end
+            )
+
 
 
         if source_ip:
@@ -704,9 +781,53 @@ def get_quarantined_hosts():
         per_page = 50
 
 
-        pagination = QuarantinedHost.query.filter_by(
+
+        query = QuarantinedHost.query.filter_by(
             status='quarantined'
-        ).order_by(
+        )
+
+
+        period = request.args.get("period")
+
+        start_time = request.args.get("start_time")
+
+        end_time = request.args.get("end_time")
+
+
+        if period:
+
+            start, end = get_time_range(period)
+
+
+            if start:
+
+                query = query.filter(
+                    QuarantinedHost.quarantined_at >= start,
+                    QuarantinedHost.quarantined_at <= end
+                )
+
+
+        if period == "custom" and start_time and end_time:
+
+
+            start = datetime.fromisoformat(
+                start_time
+            )
+
+
+            end = datetime.fromisoformat(
+                end_time
+            )
+
+
+            query = query.filter(
+                QuarantinedHost.quarantined_at >= start,
+                QuarantinedHost.quarantined_at <= end
+            )
+
+
+
+        pagination = query.order_by(
             QuarantinedHost.quarantined_at.desc()
         ).paginate(
             page=page,
