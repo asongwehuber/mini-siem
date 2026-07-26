@@ -99,6 +99,8 @@ reports/
 *.pdf
 *.png
 *.txt
+*.csv
+
 
 # =========================
 # GEOIP / MAXMIND FILES

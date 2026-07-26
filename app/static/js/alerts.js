@@ -13,12 +13,24 @@ let allAlerts = [];
 
 
 
-
 function loadAlerts(page = 1){
 
 
+    let params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    params.set(
+        "page",
+        page
+    );
+
+
     fetch(
-        "/alerts?page=" + page
+        "/alerts/search?" +
+        params.toString()
     )
 
 
@@ -28,7 +40,8 @@ function loadAlerts(page = 1){
     .then(data => {
 
 
-        allAlerts = data.alerts;
+        allAlerts =
+            data.alerts;
 
 
         displayAlerts(
@@ -59,7 +72,6 @@ function loadAlerts(page = 1){
 
 
 }
-
 
 
 
@@ -360,8 +372,11 @@ function applyAlertFilters(page = 1){
     }
 
 
-
-
+    window.history.pushState(
+        {},
+        "",
+        "?" + params.toString()
+    );
 
 
     fetch(
@@ -492,9 +507,6 @@ function updateAlertPagination(
     }
 
 
-
-
-
     let buttons =
         document.getElementById(
             "alerts-pagination-buttons"
@@ -523,7 +535,7 @@ function updateAlertPagination(
 
         `
 
-        <button onclick="loadAlerts(${page-1})">
+        <button onclick="changeAlertPage(${page-1})">
 
             ◀ Previous
 
@@ -546,7 +558,7 @@ function updateAlertPagination(
 
         `
 
-        <button onclick="loadAlerts(${page+1})">
+        <button onclick="changeAlertPage(${page+1})">
 
             Next ▶
 
@@ -617,6 +629,220 @@ function toggleCustomTime(){
 
     }
 
+
+
+}
+
+
+function exportAlertsCSV(){
+
+    let severity =
+        document.getElementById(
+            "severity-filter"
+        ).value;
+
+
+    let status =
+        document.getElementById(
+            "status-filter"
+        ).value;
+
+
+    let period =
+        document.getElementById(
+            "time-filter"
+        ).value;
+
+
+    let start_time =
+        document.getElementById(
+            "start-time"
+        ).value;
+
+
+    let end_time =
+        document.getElementById(
+            "end-time"
+        ).value;
+
+
+
+    let search =
+        document.getElementById(
+            "search-input"
+        ).value.trim();
+
+
+
+    let params = new URLSearchParams();
+
+
+
+    if(search){
+
+        params.append(
+            "source_ip",
+            search
+        );
+
+    }
+
+
+    if(severity){
+
+        params.append(
+            "severity",
+            severity
+        );
+
+    }
+
+
+    if(status){
+
+        params.append(
+            "status",
+            status
+        );
+
+    }
+
+
+    if(period){
+
+        params.append(
+            "period",
+            period
+        );
+
+    }
+
+
+    if(period === "custom"){
+
+        params.append(
+            "start_time",
+            start_time
+        );
+
+
+        params.append(
+            "end_time",
+            end_time
+        );
+
+    }
+
+
+
+    window.location.href =
+        "/alerts/export/csv?" +
+        params.toString();
+
+}
+
+function exportAlertsPDF(){
+
+    let params = new URLSearchParams();
+
+
+    let severity =
+        document.getElementById(
+            "severity-filter"
+        ).value;
+
+
+    let status =
+        document.getElementById(
+            "status-filter"
+        ).value;
+
+
+    let period =
+        document.getElementById(
+            "time-filter"
+        ).value;
+
+
+
+    if(severity)
+        params.append(
+            "severity",
+            severity
+        );
+
+
+    if(status)
+        params.append(
+            "status",
+            status
+        );
+
+
+    if(period)
+        params.append(
+            "period",
+            period
+        );
+
+
+
+    window.location.href =
+        "/alerts/export/pdf?" +
+        params.toString();
+
+}
+
+function changeAlertPage(page){
+
+
+    let params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    params.set(
+        "page",
+        page
+    );
+
+
+
+    fetch(
+        "/alerts/search?" +
+        params.toString()
+    )
+
+
+    .then(response => response.json())
+
+
+    .then(data => {
+
+
+        displayAlerts(
+            data.alerts
+        );
+
+
+        updateAlertPagination(
+            data.page,
+            data.pages,
+            data.total
+        );
+
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Pagination error:",
+            error
+        );
+
+    });
 
 
 }

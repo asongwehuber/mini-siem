@@ -137,6 +137,11 @@ function displayQuarantinedHosts(hosts){
                 ${host.quarantined_at}
             </td>
 
+            
+            <td>
+                ${host.released_at || "-"}
+            </td>
+
 
 
             <td>
@@ -530,5 +535,206 @@ function toggleCustomTime(){
 
     }
 
+
+}
+
+function exportQuarantineCSV(){
+
+
+    let params = new URLSearchParams();
+
+
+
+    let search =
+        document.getElementById(
+            "search-input"
+        ).value.trim();
+
+
+
+    let status =
+        document.getElementById(
+            "status-filter"
+        ).value;
+
+
+
+    let period =
+        document.getElementById(
+            "time-filter"
+        ).value;
+
+
+
+    let start_time =
+        document.getElementById(
+            "start-time"
+        ).value;
+
+
+
+    let end_time =
+        document.getElementById(
+            "end-time"
+        ).value;
+
+
+
+    if(search){
+
+        params.append(
+            "search",
+            search
+        );
+
+    }
+
+
+
+    if(status){
+
+        params.append(
+            "status",
+            status
+        );
+
+    }
+
+
+
+    if(period){
+
+        params.append(
+            "period",
+            period
+        );
+
+    }
+
+
+
+    if(period === "custom"){
+
+
+        params.append(
+            "start_time",
+            start_time
+        );
+
+
+        params.append(
+            "end_time",
+            end_time
+        );
+
+    }
+
+
+
+    window.location.href =
+        "/quarantine/export/csv?"
+        +
+        params.toString();
+
+}
+
+
+function exportQuarantinePDF(){
+
+
+    let params = new URLSearchParams();
+
+
+
+    let search =
+        document.getElementById(
+            "search-input"
+        ).value.trim();
+
+
+
+    let status =
+        document.getElementById(
+            "status-filter"
+        ).value;
+
+
+
+    let period =
+        document.getElementById(
+            "time-filter"
+        ).value;
+
+
+
+    let start_time =
+        document.getElementById(
+            "start-time"
+        ).value;
+
+
+
+    let end_time =
+        document.getElementById(
+            "end-time"
+        ).value;
+
+
+
+    if(search){
+
+        params.append(
+            "search",
+            search
+        );
+
+    }
+
+
+
+    if(status){
+
+        params.append(
+            "status",
+            status
+        );
+
+    }
+
+
+
+    if(period){
+
+        params.append(
+            "period",
+            period
+        );
+
+    }
+
+
+
+    if(period === "custom"){
+
+
+        params.append(
+            "start_time",
+            start_time
+        );
+
+
+        params.append(
+            "end_time",
+            end_time
+        );
+
+    }
+
+
+
+    window.location.href =
+        "/quarantine/export/pdf?"
+        +
+        params.toString();
 
 }

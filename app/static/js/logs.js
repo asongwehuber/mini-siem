@@ -439,6 +439,22 @@ function toggleCustomTime(){
 
 }
 
+
+function exportLogs(type){
+
+    let params = new URLSearchParams(
+        window.location.search
+    );
+
+    window.location.href =
+        "/logs/export/" +
+        type +
+        "?" +
+        params.toString();
+
+}
+
+
 function changeLogPage(page){
 
     let params =
@@ -481,3 +497,19 @@ function changeLogPage(page){
 
 
 }
+
+document
+.getElementById("export-pdf-btn")
+.addEventListener("click", function(){
+
+    exportLogs("pdf");
+
+});
+
+document
+.getElementById("export-csv-btn")
+.addEventListener("click", function(){
+
+    exportLogs("csv");
+
+});

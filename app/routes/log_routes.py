@@ -782,9 +782,7 @@ def get_quarantined_hosts():
 
 
 
-        query = QuarantinedHost.query.filter_by(
-            status='quarantined'
-        )
+        query = QuarantinedHost.query
 
 
         period = request.args.get("period")
@@ -851,6 +849,9 @@ def get_quarantined_hosts():
                     "status": host.status,
                     "quarantined_at": format_time(
                         host.quarantined_at
+                    ),
+                    "released_at": format_time(
+                        host.released_at
                     )
                 }
 
@@ -905,6 +906,8 @@ def release_host(host_id):
             }), 404
 
         host.status = "released"
+
+        host.released_at = datetime.utcnow()
 
         db.session.commit()
 
