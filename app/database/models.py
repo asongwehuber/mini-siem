@@ -61,6 +61,7 @@ class Log(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     source_ip = db.Column(db.String(100), nullable=False)
+    generator_id = db.Column(db.String(50), nullable=False)
     hostname = db.Column(db.String(100))
     event_type = db.Column(db.String(100), nullable=False)
     severity = db.Column(db.String(50))
@@ -123,3 +124,48 @@ def load_user(user_id):
     return Admin.query.get(int(user_id))
 
 from app.database.trusted_device import TrustedDevice
+
+
+# =========================
+# HEARTBEAT STATUS
+# =========================
+class HeartbeatStatus(db.Model):
+    __tablename__ = "heartbeat_status"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    generator_id = db.Column(
+        db.String(50),
+        unique=True,
+        nullable=False
+    )
+
+    hostname = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    source_type = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(20),
+        default="offline"
+    )
+
+    last_heartbeat = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+    last_log = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+    total_logs = db.Column(
+        db.Integer,
+        default=0
+    )

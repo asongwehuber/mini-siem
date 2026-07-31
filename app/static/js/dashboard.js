@@ -6,6 +6,7 @@ let alarmMuted = false;
 let lastTriggeredAlertId = null;
 let alarmUnlocked = false;
 let alarmInstance = null;
+let expandedMachines = new Set();
 
 // Get audio element safely
 function getAlarm() {
@@ -304,9 +305,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadDashboard();
     loadQuarantinedHosts();
+    loadMachineStatus();
 
     setInterval(loadDashboard, 3000);
     setInterval(loadQuarantinedHosts, 3000);
+    setInterval(loadMachineStatus, 3000)
 
 });
 
@@ -420,6 +423,126 @@ async function loadQuarantinedHosts() {
         );
     }
 }
+
+
+// =========================================
+// MACHINE STATUS
+// =========================================
+
+async function loadMachineStatus() {
+
+    try {
+
+        const response = await fetch("/machine-status");
+
+        if (!response.ok) return;
+
+        const machines = await response.json();
+
+        const container = document.getElementById(
+            "machine-status-grid"
+        );
+
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        machines.forEach(machine => {
+
+            const online =
+                machine.status === "online";
+
+            container.innerHTML += `
+
+                <div class="machine-card"
+                    data-hostname="${machine.hostname}">
+
+                    <div class="machine-header">
+
+                        <span class="machine-title">
+
+                            ${online ? "🟢" : "🔴"}
+
+                            ${machine.hostname}
+
+                        </span>
+
+                        <button
+                            class="expand-btn"
+                            onclick="toggleMachine(this)">
+
+                            +
+
+                        </button>
+
+                    </div>
+
+                    <div class="machine-body">
+
+                        <p>
+                            <strong>Generator ID:</strong>
+                            ${machine.generator_id}
+                        </p>
+
+                        <p>
+                            <strong>Status:</strong>
+                            ${machine.status.toUpperCase()}
+                        </p>
+
+                        <p>
+                            <strong>Last Heartbeat:</strong>
+                            ${machine.last_heartbeat || "-"}
+                        </p>
+
+                        <p>
+                            <strong>Last Log:</strong>
+                            ${machine.last_log || "-"}
+                        </p>
+
+                        <p>
+                            <strong>Total Logs:</strong>
+                            ${machine.total_logs}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            `;
+
+            // Restore expanded state after refresh
+            const body = container.lastElementChild.querySelector(".machine-body");
+            const button = container.lastElementChild.querySelector(".expand-btn");
+
+            if (expandedMachines.has(machine.hostname)) {
+
+                body.style.display = "block";
+
+                button.textContent = "−";
+
+            }
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Machine status error:",
+            error
+        );
+
+    }
+
+}
+
+
+
+
+
+
+
 
 // =========================================
 // CHAT SYSTEM for ai
@@ -590,4 +713,32 @@ function closeModal() {
     document.getElementById("aiModal").style.display = "none";
 }
 
+
+function toggleMachine(button) {
+
+    const card = button.closest(".machine-card");
+
+    const body = card.querySelector(".machine-body");
+
+    const hostname = card.dataset.hostname;
+
+    if (body.style.display === "block") {
+
+        body.style.display = "none";
+
+        button.textContent = "+";
+
+        expandedMachines.delete(hostname);
+
+    } else {
+
+        body.style.display = "block";
+
+        button.textContent = "−";
+
+        expandedMachines.add(hostname);
+
+    }
+
+}
 

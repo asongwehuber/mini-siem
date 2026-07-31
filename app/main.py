@@ -167,11 +167,14 @@ def create_app():
     from app.routes.ai import ai_bp
     from app.routes.chat import chat_bp
     from app.routes.geo_routes import geo_bp
+    from app.routes.heartbeat_routes import heartbeat_bp
     from app.auth import auth_bp
 
 
 
     app.register_blueprint(log_bp)
+    
+    app.register_blueprint(heartbeat_bp)
 
     app.register_blueprint(report_bp)
 

@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from zoneinfo import ZoneInfo
 from flask_mail import Message
 from app.extensions import db, mail
-from app.database.models import Log, Alert, QuarantinedHost
+from app.database.models import (Log, Alert, QuarantinedHost, HeartbeatStatus)
 from app.response.quarantine import quarantine_host
 from flask_login import login_required, current_user
 from app.database.trusted_device import TrustedDevice
@@ -69,6 +69,43 @@ def dashboard():
         trusted_count=trusted_count
     )
 
+# =========================================
+# MACHINE STATUS
+# =========================================
+@log_bp.route("/machine-status")
+@login_required
+def machine_status():
+
+    from datetime import datetime, timedelta
+
+    machines = HeartbeatStatus.query.order_by(
+        HeartbeatStatus.hostname
+    ).all()
+
+    data = []
+
+    now = datetime.utcnow()
+
+    for machine in machines:
+
+        if (
+            machine.last_heartbeat
+            and now - machine.last_heartbeat <= timedelta(seconds=10)
+        ):
+            status = "online"
+        else:
+            status = "offline"
+
+        data.append({
+            "generator_id": machine.generator_id,
+            "hostname": machine.hostname,
+            "status": status,
+            "last_heartbeat": format_time(machine.last_heartbeat),
+            "last_log": format_time(machine.last_log),
+            "total_logs": machine.total_logs
+        })
+
+    return jsonify(data)
 
 
 # =========================================
@@ -88,6 +125,7 @@ def submit_log():
             }), 400
 
         required_fields = [
+            'generator_id',
             'source_ip',
             'hostname',
             'event_type',
@@ -108,18 +146,27 @@ def submit_log():
         # CREATE LOG
         # =========================================
         new_log = Log(
-            source_ip=data['source_ip'],
-            hostname=data['hostname'],
-            event_type=data['event_type'].strip().lower(),
-            severity=data['severity'].strip().lower(),
-            destination_port=data['destination_port'],
-            message=data['message'],
+            generator_id=data["generator_id"],
+            source_ip=data["source_ip"],
+            hostname=data["hostname"],
+            event_type=data["event_type"].strip().lower(),
+            severity=data["severity"].strip().lower(),
+            destination_port=data["destination_port"],
+            message=data["message"],
             raw_log=str(data)
         )
 
         db.session.add(new_log)
-        db.session.commit()
 
+        heartbeat = HeartbeatStatus.query.filter_by(
+            generator_id=data["generator_id"]
+        ).first()
+
+        if heartbeat:
+            heartbeat.last_log = datetime.utcnow()
+            heartbeat.total_logs += 1
+
+        db.session.commit()
         # DEBUG: confirm log ingestion
         print("[LOG RECEIVED]", new_log.event_type, new_log.severity)
 
